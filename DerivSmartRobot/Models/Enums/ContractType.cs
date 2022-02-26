@@ -1,0 +1,38 @@
+﻿namespace DerivSmartRobot.Domain.Enums;
+
+public enum ContractType
+{
+    MULTUP,
+    MULTDOWN,
+    UPORDOWN,
+    EXPIRYRANGE,
+    ONETOUCH,
+    CALLE,
+    LBHIGHLOW,
+    ASIAND,
+    EXPIRYRANGEE,
+    DIGITDIFF,
+    DIGITMATCH,
+    DIGITOVER,
+    PUTE,
+    DIGITUNDER,
+    NOTOUCH,
+    CALL,
+    RANGE,
+    LBFLOATPUT,
+    DIGITODD,
+    PUT,
+    ASIANU,
+    LBFLOATCALL,
+    EXPIRYMISSE,
+    EXPIRYMISS,
+    DIGITEVEN,
+    TICKHIGH,
+    TICKLOW,
+    RESETCALL,
+    RESETPUT,
+    CALLSPREAD,
+    PUTSPREAD,
+    RUNHIGH,
+    RUNLOW
+}

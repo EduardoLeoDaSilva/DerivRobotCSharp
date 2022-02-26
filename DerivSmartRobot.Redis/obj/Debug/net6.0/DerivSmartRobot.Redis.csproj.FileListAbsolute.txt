@@ -1,0 +1,12 @@
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\bin\Debug\net6.0\DerivSmartRobot.Redis.deps.json
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\bin\Debug\net6.0\DerivSmartRobot.Redis.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\bin\Debug\net6.0\ref\DerivSmartRobot.Redis.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\bin\Debug\net6.0\DerivSmartRobot.Redis.pdb
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.csproj.AssemblyReference.cache
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.AssemblyInfoInputs.cache
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.AssemblyInfo.cs
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.csproj.CoreCompileInputs.cache
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\ref\DerivSmartRobot.Redis.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot.Redis\obj\Debug\net6.0\DerivSmartRobot.Redis.pdb
