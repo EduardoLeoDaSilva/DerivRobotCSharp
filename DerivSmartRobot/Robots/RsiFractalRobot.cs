@@ -52,7 +52,7 @@ public class RsiFractalRobot : BaseRobot, IRobotOperations, IRsiFractalRobot
             && fractal.FractalBear != null
             && LastFractalBuyDate != fractal.Date
             && candles.TakeLast(2).First().IsBullish
-            && candles.TakeLast(2).First().BodyPct >= 0.5)
+            && candles.TakeLast(2).First().BodyPct >= 0.2)
         {
             LastFractalBuyDate = fractal.Date;
             Console.WriteLine("Fractal");
@@ -64,7 +64,7 @@ public class RsiFractalRobot : BaseRobot, IRobotOperations, IRsiFractalRobot
                  && fractal.FractalBull != null
                  && LastFractalBuyDate != fractal.Date
                  && candles.TakeLast(2).First().IsBearish
-                 && candles.TakeLast(2).First().BodyPct >= 0.5)
+                 && candles.TakeLast(2).First().BodyPct >= 0.2)
         {
             Console.WriteLine("Fractal");
 

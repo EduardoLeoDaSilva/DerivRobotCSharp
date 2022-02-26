@@ -45,6 +45,18 @@ public class TradeService : ITradeService
 
     public bool BuyAContract(Proposal proposal)
     {
+        if ((proposal.AskPrice * -1) + (double) currentOperation.CurrentOperationBalance> (double) RobotConfigutarion.StopLoss)
+        {
+            Console.WriteLine("STOPLOSS alcançado");
+            return true;
+        }
+
+        if (currentOperation.CurrentOperationBalance >= RobotConfigutarion.StopWin)
+        {
+            Console.WriteLine("STOPWIN alcançado");
+            return true;
+        }
+        
         var buy = CommandsService.GetCommands(CommandsApi.Buy, proposal);
         _client.SendCommand(buy);
         return true;

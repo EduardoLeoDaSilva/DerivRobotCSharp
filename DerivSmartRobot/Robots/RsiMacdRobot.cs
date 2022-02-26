@@ -49,13 +49,13 @@ public class RsiMacdRobot : BaseRobot, IRobotOperations, IRsiMacdRobot
         var macdResults = minuteBarQuotes.GetMacd();
         
 
-        if (macdResults.TakeLast(10).Any(x => x.Histogram < 0) && macdResults.Last().Histogram > (decimal?) 0.2 && RsiAction == "buy")
+        if (macdResults.TakeLast(10).Any(x => x.Histogram < 0) && macdResults.Last().Histogram > (decimal?) 0 && RsiAction == "buy")
         {
             Console.WriteLine("RsiMacd");
             Console.WriteLine("BUY");
             RsiAction = "";
             this.MakeAProposal(ContractType.CALL, 80, "s");
-        }else if (macdResults.TakeLast(10).Any(x => x.Histogram > 0) && macdResults.Last().Histogram < (decimal?) -0.2 && RsiAction == "sell")
+        }else if (macdResults.TakeLast(10).Any(x => x.Histogram > 0) && macdResults.Last().Histogram < (decimal?) 0 && RsiAction == "sell")
         {
             Console.WriteLine("RsiMacd");
             Console.WriteLine("SELL");

@@ -104,14 +104,14 @@ public class RsiRobot : BaseRobot, IRobotOperations, IRsiRobot
             BuyDeadLine = null;
         }
 
-        if (ActionStockRsi == "buy" && ActionParabolicSar == "buy")
+        if (ActionStockRsi == "buy" && candles.Last().IsBullish && candles.Last().BodyPct > 0.2)
         {
             if (DateTime.Now <= BuyDeadLine)
             {
                 Console.WriteLine("Rsi - Comprando em Call");
 
 
-                this.MakeAProposal(ContractType.CALL, 5, "m");
+                this.MakeAProposal(ContractType.CALL, 1, "m");
                 ActionStockRsi = "";
                 ActionParabolicSar = "";
                 BuyDeadLine = null;
@@ -124,12 +124,12 @@ public class RsiRobot : BaseRobot, IRobotOperations, IRsiRobot
             }
         }
 
-        if (ActionStockRsi == "sell"  && ActionParabolicSar == "sell")
+        if (ActionStockRsi == "sell"  && candles.Last().IsBearish && candles.Last().BodyPct > 0.2)
         {
             if (DateTime.Now <= BuyDeadLine)
             {
                 Console.WriteLine("Rsi - Comprando em PUT");
-                this.MakeAProposal(ContractType.PUT, 5, "m");
+                this.MakeAProposal(ContractType.PUT, 1, "m");
                 ActionStockRsi = "";
                 ActionParabolicSar = "";
                 BuyDeadLine = null;

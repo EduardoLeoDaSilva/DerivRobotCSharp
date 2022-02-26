@@ -34,7 +34,7 @@ public abstract class BaseRobot : IRobotOperations
             operationInfo.NewAmount = 0;
         }
     }
-    
+
     public virtual Transaction GetTransactionFromCurrentOperationMarket(string market, ResponseMessage responseMessage)
     {
         if (responseMessage.Transaction.Symbol == market)
