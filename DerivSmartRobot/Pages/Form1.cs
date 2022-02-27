@@ -142,5 +142,13 @@ namespace DerivSmartRobot.Pages
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            var form2 = new Config(_tradeService, _hostedService);
+            form2.Closed += (s, args) => this.Close();
+            form2.Show();
+        }
     }
 }

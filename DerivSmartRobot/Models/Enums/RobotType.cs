@@ -7,5 +7,6 @@ public enum RobotType
     MACD =3,
     RSIMACD =4,
     RsiFractal = 5,
-    Marubuzu =6
+    Marubuzu =6,
+    RsiStockHigherAndLower = 7
 }

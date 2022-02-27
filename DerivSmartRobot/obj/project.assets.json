@@ -1642,7 +1642,7 @@
           }
         }
       },
-      "Skender.Stock.Indicators/1.21.0": {
+      "Skender.Stock.Indicators/1.21.1": {
         "type": "package",
         "compile": {
           "lib/net6.0/Skender.Stock.Indicators.dll": {}
@@ -5715,10 +5715,10 @@
         "runtimes/ubuntu.16.10-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
       ]
     },
-    "Skender.Stock.Indicators/1.21.0": {
-      "sha512": "TInmzrNnYG9oZboxF4pVnnirUlDcAfhjCqJrjnU4Ejpbba4QKELyW8KB0JasJmuFWMgKDT7t5XO+Jm5+OxaagA==",
+    "Skender.Stock.Indicators/1.21.1": {
+      "sha512": "9vQHFMurZpWNtvUaL/7H6wkYglF+5wtKkdtgHJ+Trpf6dlsHOF7ZSG7GaDOz1rI5a2Y2GML7WQ0vdo9AbWdfqQ==",
       "type": "package",
-      "path": "skender.stock.indicators/1.21.0",
+      "path": "skender.stock.indicators/1.21.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5736,7 +5736,7 @@
         "lib/netstandard2.0/Skender.Stock.Indicators.xml",
         "lib/netstandard2.1/Skender.Stock.Indicators.dll",
         "lib/netstandard2.1/Skender.Stock.Indicators.xml",
-        "skender.stock.indicators.1.21.0.nupkg.sha512",
+        "skender.stock.indicators.1.21.1.nupkg.sha512",
         "skender.stock.indicators.nuspec"
       ]
     },
@@ -10236,7 +10236,7 @@
       "Microsoft.Extensions.Configuration >= 6.0.0",
       "Microsoft.Extensions.DependencyInjection.Abstractions >= 6.0.0",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.1",
-      "Skender.Stock.Indicators >= 1.21.0",
+      "Skender.Stock.Indicators >= 1.21.1",
       "StackExchange.Redis >= 2.2.88",
       "Swashbuckle.AspNetCore >= 6.2.3",
       "WebSocketSharp >= 1.0.3-rc11"
@@ -10266,7 +10266,7 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0-windows"
+        "net6.0-windows7.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -10320,7 +10320,7 @@
           },
           "Skender.Stock.Indicators": {
             "target": "Package",
-            "version": "[1.21.0, )"
+            "version": "[1.21.1, )"
           },
           "StackExchange.Redis": {
             "target": "Package",

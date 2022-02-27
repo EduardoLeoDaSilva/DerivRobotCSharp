@@ -1486,11 +1486,11 @@
           }
         }
       },
-      "Skender.Stock.Indicators/1.21.0": {
+      "Skender.Stock.Indicators/1.21.1": {
         "runtime": {
           "lib/net6.0/Skender.Stock.Indicators.dll": {
-            "assemblyVersion": "1.21.0.0",
-            "fileVersion": "1.21.0.0"
+            "assemblyVersion": "1.21.1.0",
+            "fileVersion": "1.21.1.0"
           }
         }
       },
@@ -3508,12 +3508,12 @@
       "path": "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl/4.3.2",
       "hashPath": "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512"
     },
-    "Skender.Stock.Indicators/1.21.0": {
+    "Skender.Stock.Indicators/1.21.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-TInmzrNnYG9oZboxF4pVnnirUlDcAfhjCqJrjnU4Ejpbba4QKELyW8KB0JasJmuFWMgKDT7t5XO+Jm5+OxaagA==",
-      "path": "skender.stock.indicators/1.21.0",
-      "hashPath": "skender.stock.indicators.1.21.0.nupkg.sha512"
+      "sha512": "sha512-9vQHFMurZpWNtvUaL/7H6wkYglF+5wtKkdtgHJ+Trpf6dlsHOF7ZSG7GaDOz1rI5a2Y2GML7WQ0vdo9AbWdfqQ==",
+      "path": "skender.stock.indicators/1.21.1",
+      "hashPath": "skender.stock.indicators.1.21.1.nupkg.sha512"
     },
     "StackExchange.Redis/2.2.88": {
       "type": "package",

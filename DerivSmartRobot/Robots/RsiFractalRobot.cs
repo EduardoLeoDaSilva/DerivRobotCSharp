@@ -25,12 +25,16 @@ public class RsiFractalRobot : BaseRobot, IRobotOperations, IRsiFractalRobot
         Quotes.Add(quote);
 
         IEnumerable<Quote> minuteBarQuotes =
-            Quotes.Aggregate(TimeSpan.FromMinutes(1));
+            Quotes.Aggregate(TimeSpan.FromMinutes(2));
 
         var rsi = minuteBarQuotes.GetRsi().Last().Rsi;
 
-        var fractalResults = minuteBarQuotes.GetFractal().Where(x => x.FractalBear != null || x.FractalBull != null);
-        var parabolicSarList = minuteBarQuotes.GetParabolicSar();
+        var fractalResults = minuteBarQuotes.GetFractal(3).Where(x => x.FractalBear != null || x.FractalBull != null);
+        var sma5 = minuteBarQuotes.GetSma(5);
+        var sma2 = minuteBarQuotes.GetSma(2);
+        var sma100 = minuteBarQuotes.GetSma(100);
+
+
 
         var fractal = fractalResults.Last();
 
@@ -51,8 +55,9 @@ public class RsiFractalRobot : BaseRobot, IRobotOperations, IRsiFractalRobot
         if ((quote.Date - fractal.Date).TotalMinutes < 5
             && fractal.FractalBear != null
             && LastFractalBuyDate != fractal.Date
-            && candles.TakeLast(2).First().IsBullish
-            && candles.TakeLast(2).First().BodyPct >= 0.2)
+            && sma100.Last().Sma < quote.Close
+            && sma5.TakeLast(2).First().Sma >= sma2.TakeLast(2).First().Sma
+            && sma2.Last().Sma > sma5.Last().Sma)
         {
             LastFractalBuyDate = fractal.Date;
             Console.WriteLine("Fractal");
@@ -63,8 +68,9 @@ public class RsiFractalRobot : BaseRobot, IRobotOperations, IRsiFractalRobot
         else if ((quote.Date - fractal.Date).TotalMinutes < 5
                  && fractal.FractalBull != null
                  && LastFractalBuyDate != fractal.Date
-                 && candles.TakeLast(2).First().IsBearish
-                 && candles.TakeLast(2).First().BodyPct >= 0.2)
+                 && sma100.Last().Sma > quote.Close
+                 && sma5.TakeLast(2).First().Sma <= sma2.TakeLast(2).First().Sma
+                 && sma2.Last().Sma < sma5.Last().Sma)
         {
             Console.WriteLine("Fractal");
 

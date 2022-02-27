@@ -52,6 +52,8 @@ internal static class Program
         services.AddSingleton<IDigitRobotRobot, DigitRobot>();
         services.AddSingleton<ISmaAndWmaGoRobot, SmaAndWmaGoRobot>();
         services.AddSingleton<IMarubuzuRobot, MarubuzuRobot>();
+        services.AddSingleton<IRsiStockHigherAndLowerRobot, RsiStockHigherAndLowerRobot>();
+
         services.AddTransient<ReaderService>();
 
 

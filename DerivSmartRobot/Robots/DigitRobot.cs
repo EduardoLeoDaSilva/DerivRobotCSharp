@@ -31,6 +31,14 @@ public class DigitRobot :BaseRobot, IRobotOperations, IDigitRobotRobot
         var quote  = this.BuildQuoteModel(message);
         Quotes.Add(quote);
 
+        if (_tradeService.currentOperation.LossToRecover > 0)
+        {
+            _tradeService.RobotConfigutarion.RobotType = RobotType.RSI;
+            _tradeService.RobotConfigutarion.CalledFrom = RobotType.Digit;
+            _tradeService.QuotesCached = Quotes;
+            return;
+        }
+
         var quoteString = quote.Close.ToString("F"+ message.Ohlc.Pip_size);
         var currentLastDigit = quoteString.Substring(quoteString.Length - 1, 1);
         
@@ -46,8 +54,8 @@ public class DigitRobot :BaseRobot, IRobotOperations, IDigitRobotRobot
         if (TimesRepeated >= 2)
         {
             TimesRepeated = 0;
-            AvailableNumbers.Remove(PriorLastDigit.Value);
-            this.MakeAProposal(ContractType.DIGITDIFF, 1, "t", PriorLastDigit.Value);
+            this.MakeAProposal(ContractType.DIGITDIFF, new Random().Next(1,3), "t", PriorLastDigit.Value.ToString());
+            // AvailableNumbers.Remove(PriorLastDigit.Value);
         }
 
         if (PriorLastDigit == int.Parse(currentLastDigit) && AvailableNumbers.Contains(int.Parse(currentLastDigit)))
@@ -63,7 +71,7 @@ public class DigitRobot :BaseRobot, IRobotOperations, IDigitRobotRobot
 
     }
 
-    public void MakeAProposal(ContractType contract, int duration, string durationUnit, decimal? barrier)
+    public void MakeAProposal(ContractType contract, int duration, string durationUnit, string? barrier)
     {
         _tradeService.MakeAProposal(contract, duration, durationUnit, barrier);
 

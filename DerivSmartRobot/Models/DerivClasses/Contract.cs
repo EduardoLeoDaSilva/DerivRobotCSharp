@@ -9,7 +9,7 @@ public class Contract
         [JsonProperty("amount")]
         public decimal? Amount { get; set; }
         [JsonProperty("barrier")]
-        public decimal? Barrier  { get; set; }
+        public string? Barrier  { get; set; }
         [JsonProperty("basis")]
         public string? Basis { get; set; } = "stake";
         [JsonProperty("contract_type")]

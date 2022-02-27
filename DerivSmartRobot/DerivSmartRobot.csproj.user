@@ -2,7 +2,19 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
+    <Compile Update="Pages\Components\LogPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Pages\Config.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Pages\Dash.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Pages\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Pages\Login.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

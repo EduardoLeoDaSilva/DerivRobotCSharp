@@ -20,11 +20,13 @@ public class ReaderService
     private readonly IMacdRobot _macdRobot;
     private readonly IMarubuzuRobot _marubuzuRobot;
     private readonly IDigitRobotRobot _digitRobot;
+    private readonly IRsiStockHigherAndLowerRobot _rsiStockHigherAndLowerRobotRoboto;
+
 
 
 
     public ReaderService(ITradeService tradeService, IRsiRobot rsiRobot,
-        IRsiFractalRobot rsiFractalRobotRobot, ISmaAndWmaGoRobot smaAndWmaGoRobot, IRsiMacdRobot rsiMacdRobot, IMacdRobot macdRobot, IMarubuzuRobot marubuzuRobot, IDigitRobotRobot digitRobot)
+        IRsiFractalRobot rsiFractalRobotRobot, ISmaAndWmaGoRobot smaAndWmaGoRobot, IRsiMacdRobot rsiMacdRobot, IMacdRobot macdRobot, IMarubuzuRobot marubuzuRobot, IDigitRobotRobot digitRobot, IRsiStockHigherAndLowerRobot rsiStockHigherAndLowerRobotRoboto)
     {
         _tradeService = tradeService;
         _rsiRobot = rsiRobot;
@@ -34,6 +36,7 @@ public class ReaderService
         _macdRobot = macdRobot;
         _marubuzuRobot = marubuzuRobot;
         _digitRobot = digitRobot;
+        _rsiStockHigherAndLowerRobotRoboto = rsiStockHigherAndLowerRobotRoboto;
     }
 
     public void ReadValueFromDeriv(object? sender, MessageEventArgs e)
@@ -284,6 +287,41 @@ public class ReaderService
                         break;
                     case CommandsApi.Candles:
                         _marubuzuRobot.FillQuotesWithHistoricalData(responseMessage);
+                        break;
+                }
+                break;
+            case RobotType.RsiStockHigherAndLower:
+                switch (commandsApi)
+                {
+                    case CommandsApi.OlhcStream:
+                        _rsiStockHigherAndLowerRobotRoboto.VerifyAndBuy(responseMessage);
+                        break;
+                    case CommandsApi.TransactionStream:
+                        var transaction = _rsiStockHigherAndLowerRobotRoboto.GetTransactionFromCurrentOperationMarket(
+                            _tradeService.RobotConfigutarion.Market,
+                            responseMessage);
+                        if (transaction != null)
+                        {
+                            if (transaction.Action == ContractAction.Sell)
+                            {
+                                _tradeService.IsOperating = false;
+                            }
+                            Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
+                            _rsiStockHigherAndLowerRobotRoboto.UpdateOperationInfo(responseMessage, _tradeService);
+                        }
+                        _rsiStockHigherAndLowerRobotRoboto.GetAmountWithMartingale(_tradeService.currentOperation,
+                            _tradeService.RobotConfigutarion.MartingaleValue,
+                            _tradeService.RobotConfigutarion.MartigaleType);
+
+                        break;
+                    case CommandsApi.Buy:
+                        Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
+                        break;
+                    case CommandsApi.Proposal:
+                        _tradeService.BuyAContract(responseMessage.Proposal);
+                        break;
+                    case CommandsApi.Candles:
+                        _rsiStockHigherAndLowerRobotRoboto.FillQuotesWithHistoricalData(responseMessage);
                         break;
                 }
                 break;

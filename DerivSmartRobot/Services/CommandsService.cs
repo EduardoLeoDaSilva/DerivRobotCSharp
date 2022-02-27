@@ -95,7 +95,7 @@ public class CommandsService
         }
     }
     
-    public static Contract BuildContractModel(int? Proposal, decimal? Amount, decimal? Barrier, string? Basis,
+    public static Contract BuildContractModel(int? Proposal, decimal? Amount, string? Barrier, string? Basis,
         string? Contract_type, string? Currency, int? Duration, string? Duration_unit, string? Symbol)
     {
         var request = new Contract

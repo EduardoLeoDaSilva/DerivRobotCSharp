@@ -2,6 +2,7 @@
 using DerivSmartRobot.Models.Classes;
 using DerivSmartRobot.Models.DerivClasses;
 using DerivSmartRobot.Redis;
+using Skender.Stock.Indicators;
 
 namespace DerivSmartRobot.Services;
 
@@ -12,6 +13,9 @@ public class TradeService : ITradeService
 
     private readonly IClientDeriv _client;
     public bool IsOperating { get; set; } = false;
+    
+    public List<Quote> QuotesCached { get; set; }
+
 
     public TradeService(IClientDeriv client)
     {
@@ -26,14 +30,14 @@ public class TradeService : ITradeService
         return true;
     }
 
-    public bool MakeAProposal(ContractType contractType, int duration, string durationUnit, decimal? barrier = null)
+    public bool MakeAProposal(ContractType contractType, int duration, string durationUnit, string? barrier = null)
     {
         if (IsOperating)
             return true;
         
         var amount = Convert.ToDecimal(string.Format("{0:F2}",currentOperation.NewAmount != 0 ? currentOperation.NewAmount : RobotConfigutarion.Stake));
         var contract = CommandsService.GetCommands(CommandsApi.Proposal,
-            CommandsService.BuildContractModel(1,  currentOperation.NewAmount != 0 ? currentOperation.NewAmount :RobotConfigutarion.Stake, barrier, "stake", contractType.ToString(),
+            CommandsService.BuildContractModel(1,  amount, barrier, "stake", contractType.ToString(),
                 "USD", duration, durationUnit, RobotConfigutarion.Market));
 
         currentOperation.LastValueLost = amount;
@@ -68,6 +72,12 @@ public class TradeService : ITradeService
             return;
         if(responseMessage.Transaction.Action == ContractAction.Buy)
             return;
+
+        if (currentOperation.LossToRecover > 0 && RobotConfigutarion.CalledFrom != null)
+        {
+            RobotConfigutarion.RobotType = RobotConfigutarion.CalledFrom.Value;
+            RobotConfigutarion.CalledFrom = null;
+        }
         
         if (responseMessage.Transaction.Amount == 0)
         {

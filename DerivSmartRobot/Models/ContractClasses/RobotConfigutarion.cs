@@ -13,4 +13,6 @@ public class RobotConfigutarion
     public decimal MaxLossSequenceAfterThisProfit { get; set; }
     public MartingaleType MartigaleType { get; set; } = MartingaleType.Normal;
     public decimal MartingaleValue { get; set; }
+
+    public RobotType? CalledFrom { get; set; } = null;
 }

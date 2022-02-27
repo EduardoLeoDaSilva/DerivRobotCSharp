@@ -42,6 +42,10 @@ public class RsiRobot : BaseRobot, IRobotOperations, IRsiRobot
     public void VerifyAndBuy(ResponseMessage message)
     {
         var quote = this.BuildQuoteModel(message);
+
+        if (Quotes == null)
+            Quotes = _tradeService.QuotesCached;
+        
         Quotes.Add(quote);
 
         IEnumerable<Quote> minuteBarQuotes =
@@ -104,7 +108,7 @@ public class RsiRobot : BaseRobot, IRobotOperations, IRsiRobot
             BuyDeadLine = null;
         }
 
-        if (ActionStockRsi == "buy" && candles.Last().IsBullish && candles.Last().BodyPct > 0.2)
+        if (ActionStockRsi == "buy" && candles.TakeLast(2).First().IsBullish && candles.TakeLast(2).First().BodyPct > 0.2 && ActionParabolicSar == "buy" )
         {
             if (DateTime.Now <= BuyDeadLine)
             {
@@ -124,7 +128,7 @@ public class RsiRobot : BaseRobot, IRobotOperations, IRsiRobot
             }
         }
 
-        if (ActionStockRsi == "sell"  && candles.Last().IsBearish && candles.Last().BodyPct > 0.2)
+        if (ActionStockRsi == "sell"  && candles.TakeLast(2).First().IsBearish && candles.TakeLast(2).First().BodyPct > 0.2 && ActionParabolicSar == "sell")
         {
             if (DateTime.Now <= BuyDeadLine)
             {

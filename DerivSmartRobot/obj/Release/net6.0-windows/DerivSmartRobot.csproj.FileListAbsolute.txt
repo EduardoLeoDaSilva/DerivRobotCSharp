@@ -240,3 +240,6 @@ C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.0-windows\ref\DerivSmartRobot.dll
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.0-windows\DerivSmartRobot.pdb
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.0-windows\DerivSmartRobot.genruntimeconfig.cache
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.0-windows\DerivSmartRobot.Pages.Dash.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.0-windows\DerivSmartRobot.Pages.Login.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Release\net6.0-windows\DerivSmartRobot.Properties.Resources.resources
