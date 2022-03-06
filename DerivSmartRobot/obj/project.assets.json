@@ -1244,6 +1244,22 @@
           "lib/net6.0/Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll": {}
         }
       },
+      "Microsoft.Web.WebView2/0.9.579-prerelease": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {},
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {},
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {},
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {},
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {}
+        },
+        "build": {
+          "build/Microsoft.Web.WebView2.targets": {}
+        }
+      },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -5156,6 +5172,52 @@
         "lib/net6.0/identityMinimalHostingChanges.json",
         "microsoft.visualstudio.web.codegenerators.mvc.6.0.1.nupkg.sha512",
         "microsoft.visualstudio.web.codegenerators.mvc.nuspec"
+      ]
+    },
+    "Microsoft.Web.WebView2/0.9.579-prerelease": {
+      "sha512": "i0GDcsrl2IWdZV/WpnNxTxwHYTI6eMbC8dJlPOchhEwJwxPi81hAtRbvykI8uMJlMajKyM4huZZhlzbIOXzqCQ==",
+      "type": "package",
+      "path": "microsoft.web.webview2/0.9.579-prerelease",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "WebView2.idl",
+        "WebView2.tlb",
+        "WebView2Experimental.idl",
+        "WebView2Experimental.tlb",
+        "build/Microsoft.Web.WebView2.targets",
+        "build/arm64/WebView2Loader.dll",
+        "build/native/Microsoft.Web.WebView2.targets",
+        "build/native/arm64/WebView2Guid.lib",
+        "build/native/arm64/WebView2Loader.dll",
+        "build/native/arm64/WebView2Loader.dll.lib",
+        "build/native/include/WebView2.h",
+        "build/native/include/WebView2EnvironmentOptions.h",
+        "build/native/include/WebView2Experimental.h",
+        "build/native/include/WebView2ExperimentalEnvironmentOptions.h",
+        "build/native/x64/WebView2Guid.lib",
+        "build/native/x64/WebView2Loader.dll",
+        "build/native/x64/WebView2Loader.dll.lib",
+        "build/native/x86/WebView2Guid.lib",
+        "build/native/x86/WebView2Loader.dll",
+        "build/native/x86/WebView2Loader.dll.lib",
+        "build/x64/WebView2Loader.dll",
+        "build/x86/WebView2Loader.dll",
+        "lib/net462/Microsoft.Web.WebView2.Core.dll",
+        "lib/net462/Microsoft.Web.WebView2.Core.xml",
+        "lib/net462/Microsoft.Web.WebView2.WinForms.dll",
+        "lib/net462/Microsoft.Web.WebView2.WinForms.xml",
+        "lib/net462/Microsoft.Web.WebView2.Wpf.dll",
+        "lib/net462/Microsoft.Web.WebView2.Wpf.xml",
+        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll",
+        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.xml",
+        "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll",
+        "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.xml",
+        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll",
+        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.xml",
+        "microsoft.web.webview2.0.9.579-prerelease.nupkg.sha512",
+        "microsoft.web.webview2.nuspec"
       ]
     },
     "Microsoft.Win32.Primitives/4.3.0": {
@@ -10236,6 +10298,7 @@
       "Microsoft.Extensions.Configuration >= 6.0.0",
       "Microsoft.Extensions.DependencyInjection.Abstractions >= 6.0.0",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.1",
+      "Microsoft.Web.WebView2 >= 0.9.579-prerelease",
       "Skender.Stock.Indicators >= 1.21.1",
       "StackExchange.Redis >= 2.2.88",
       "Swashbuckle.AspNetCore >= 6.2.3",
@@ -10317,6 +10380,10 @@
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
             "target": "Package",
             "version": "[6.0.1, )"
+          },
+          "Microsoft.Web.WebView2": {
+            "target": "Package",
+            "version": "[0.9.579-prerelease, )"
           },
           "Skender.Stock.Indicators": {
             "target": "Package",

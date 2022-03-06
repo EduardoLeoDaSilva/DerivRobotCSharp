@@ -1,6 +1,7 @@
-﻿namespace DerivSmartRobot.Robots;
-
-public class M5StrategyRobot
+﻿namespace DerivSmartRobot.Robots
 {
+    public class M5StrategyRobot
+    {
     
+    }
 }

@@ -1137,6 +1137,22 @@
           }
         }
       },
+      "Microsoft.Web.WebView2/0.9.579-prerelease": {
+        "runtime": {
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          },
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          },
+          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "Microsoft.Win32.Primitives/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "5.0.0",
@@ -3290,6 +3306,13 @@
       "sha512": "sha512-Za1Kz7iJ7mHbi14qYRigXyQVWF13edUTd6fpOvhraBJEdtFHqCku/oqVSKvX4GD10avBdUPgb/O8ntKJa3UaKQ==",
       "path": "microsoft.visualstudio.web.codegenerators.mvc/6.0.1",
       "hashPath": "microsoft.visualstudio.web.codegenerators.mvc.6.0.1.nupkg.sha512"
+    },
+    "Microsoft.Web.WebView2/0.9.579-prerelease": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-i0GDcsrl2IWdZV/WpnNxTxwHYTI6eMbC8dJlPOchhEwJwxPi81hAtRbvykI8uMJlMajKyM4huZZhlzbIOXzqCQ==",
+      "path": "microsoft.web.webview2/0.9.579-prerelease",
+      "hashPath": "microsoft.web.webview2.0.9.579-prerelease.nupkg.sha512"
     },
     "Microsoft.Win32.Primitives/4.3.0": {
       "type": "package",

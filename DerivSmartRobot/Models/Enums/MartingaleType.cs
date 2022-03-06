@@ -1,7 +1,8 @@
-﻿namespace DerivSmartRobot.Domain.Enums;
-
-public enum MartingaleType
+﻿namespace DerivSmartRobot.Domain.Enums
 {
-    Normal =1,
-    Recover = 2
+    public enum MartingaleType
+    {
+        Normal =1,
+        Recover = 2
+    }
 }

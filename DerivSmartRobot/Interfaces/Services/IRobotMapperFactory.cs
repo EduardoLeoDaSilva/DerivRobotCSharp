@@ -1,8 +1,10 @@
-﻿namespace DerivSmartRobot.Interfaces.Services;
-
-public interface IRobotMapperFactory
+﻿namespace DerivSmartRobot.Interfaces.Services
 {
-    IRobotOperations CreateRiseAndUnderRobot();
-    IRobotOperations CreateEvenAndOddRobot();
-    IRobotOperations CreateDigitRobot();
+
+    public interface IRobotMapperFactory
+    {
+        IRobotOperations CreateRiseAndUnderRobot();
+        IRobotOperations CreateEvenAndOddRobot();
+        IRobotOperations CreateDigitRobot();
+    }
 }

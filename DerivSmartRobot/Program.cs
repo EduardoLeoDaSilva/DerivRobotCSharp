@@ -34,10 +34,14 @@ internal static class Program
         Application.SetCompatibleTextRenderingDefault(false);
 
 
-        Application.Run(new Form1(serviceProvider));
+        //Application.Run(new Login(serviceProvider));
+        Application.Run(new Login(serviceProvider));
+        AllocConsole();
     }
 
-
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    static extern bool AllocConsole();
     static void ConfigureServices(ServiceCollection services)
     {
         services.AddSingleton<IClientDeriv, DerivClient>();
@@ -53,8 +57,13 @@ internal static class Program
         services.AddSingleton<ISmaAndWmaGoRobot, SmaAndWmaGoRobot>();
         services.AddSingleton<IMarubuzuRobot, MarubuzuRobot>();
         services.AddSingleton<IRsiStockHigherAndLowerRobot, RsiStockHigherAndLowerRobot>();
+        services.AddSingleton<ICandleMiniReversalStrategyRobot, CandleMiniReversalStrategyRobot>();
+        services.AddSingleton<IZigZagWithSarRobot, ZigZagWithSarRobot>();
+
 
         services.AddTransient<ReaderService>();
+        services.AddTransient<IAuthService, AuthService>();
+
 
 
     }

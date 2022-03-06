@@ -42,7 +42,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(56, 30);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Log";
+            this.label1.Text = "LogView";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2

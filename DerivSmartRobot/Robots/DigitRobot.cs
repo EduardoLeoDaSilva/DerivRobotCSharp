@@ -1,89 +1,95 @@
 ﻿using DerivSmartRobot.Domain.Enums;
 using DerivSmartRobot.Interfaces.Services;
 using DerivSmartRobot.Models.DerivClasses;
+using DerivSmartRobot.Models.View;
 using DerivSmartRobot.Services;
 using Skender.Stock.Indicators;
 
-namespace DerivSmartRobot.Robots;
-
-public interface IDigitRobotRobot : IRobotOperations
+namespace DerivSmartRobot.Robots
 {
-}
-
-public class DigitRobot :BaseRobot, IRobotOperations, IDigitRobotRobot
-{
-
-    public int TimesRepeated { get; set; } = 0;
-    public int QuantAbove5{ get; set; }
-
-    public List<int> AvailableNumbers { get; set; } = new List<int> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    public int? PriorLastDigit { get; set; } = null;
-
-    private readonly ITradeService _tradeService;
-
-    public DigitRobot(ITradeService tradeService)
+    public interface IDigitRobotRobot : IRobotOperations
     {
-        _tradeService = tradeService;
     }
 
-    public void VerifyAndBuy(ResponseMessage message)
+    public class DigitRobot :BaseRobot, IRobotOperations, IDigitRobotRobot
     {
-        var quote  = this.BuildQuoteModel(message);
-        Quotes.Add(quote);
 
-        if (_tradeService.currentOperation.LossToRecover > 0)
+        public int TimesRepeated { get; set; } = 0;
+        public int QuantAbove5{ get; set; }
+
+        public List<int> AvailableNumbers { get; set; } = new List<int> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        public int? PriorLastDigit { get; set; } = null;
+
+        private readonly ITradeService _tradeService;
+
+        public DigitRobot(ITradeService tradeService) :base(tradeService)
         {
-            _tradeService.RobotConfigutarion.RobotType = RobotType.RSI;
-            _tradeService.RobotConfigutarion.CalledFrom = RobotType.Digit;
-            _tradeService.QuotesCached = Quotes;
-            return;
+            _tradeService = tradeService;
         }
 
-        var quoteString = quote.Close.ToString("F"+ message.Ohlc.Pip_size);
-        var currentLastDigit = quoteString.Substring(quoteString.Length - 1, 1);
-        
-        if(!AvailableNumbers.Any())
-            AvailableNumbers = new List<int> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-
-        if (PriorLastDigit == null)
+        public void VerifyAndBuy(ResponseMessage message)
         {
+            var quote  = this.BuildQuoteModel(message);
+            Quotes.Add(quote);
+            this._tradeService.Log = this._tradeService.Log = new LogView { Date = DateTime.Now, Log = "Verificando dígitos" };
+
+
+            if (_tradeService.currentOperation.LossToRecover > 0)
+            {
+                _tradeService.RobotConfigutarion.RobotType = RobotType.RSI;
+                _tradeService.RobotConfigutarion.CalledFrom = RobotType.Digit;
+                _tradeService.QuotesCached = Quotes;
+                return;
+            }
+
+            var quoteString = quote.Close.ToString("F"+ message.Ohlc.Pip_size);
+            var currentLastDigit = quoteString.Substring(quoteString.Length - 1, 1);
+        
+            if(!AvailableNumbers.Any())
+                AvailableNumbers = new List<int> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+            if (PriorLastDigit == null)
+            {
+                PriorLastDigit = int.Parse(currentLastDigit);
+                return;
+            }
+        
+            if (TimesRepeated >= 3)
+            {
+                TimesRepeated = 0;
+                this.MakeAProposal(ContractType.DIGITDIFF, new Random().Next(1,3), "t", PriorLastDigit.Value.ToString());
+                // AvailableNumbers.Remove(PriorLastDigit.Value);
+            }
+
+            if (PriorLastDigit == int.Parse(currentLastDigit) && AvailableNumbers.Contains(int.Parse(currentLastDigit)))
+            {
+                this._tradeService.Log = new LogView {Date = DateTime.Now, Log = "Digito repetido!"};
+
+                TimesRepeated += 1;
+            }
+            else
+            {
+                TimesRepeated = 1;
+            }
+
             PriorLastDigit = int.Parse(currentLastDigit);
-            return;
+
         }
-        
-        if (TimesRepeated >= 2)
+
+        public void MakeAProposal(ContractType contract, int duration, string durationUnit, string? barrier)
         {
-            TimesRepeated = 0;
-            this.MakeAProposal(ContractType.DIGITDIFF, new Random().Next(1,3), "t", PriorLastDigit.Value.ToString());
-            // AvailableNumbers.Remove(PriorLastDigit.Value);
+            _tradeService.MakeAProposal(contract, duration, durationUnit, barrier);
+
         }
 
-        if (PriorLastDigit == int.Parse(currentLastDigit) && AvailableNumbers.Contains(int.Parse(currentLastDigit)))
+        public void Buy(ResponseMessage message)
         {
-            TimesRepeated += 1;
+            throw new NotImplementedException();
         }
-        else
+
+        public void StopOperation()
         {
-            TimesRepeated = 1;
+            throw new NotImplementedException();
         }
-
-        PriorLastDigit = int.Parse(currentLastDigit);
-
-    }
-
-    public void MakeAProposal(ContractType contract, int duration, string durationUnit, string? barrier)
-    {
-        _tradeService.MakeAProposal(contract, duration, durationUnit, barrier);
-
-    }
-
-    public void Buy(ResponseMessage message)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void StopOperation()
-    {
-        throw new NotImplementedException();
     }
 }

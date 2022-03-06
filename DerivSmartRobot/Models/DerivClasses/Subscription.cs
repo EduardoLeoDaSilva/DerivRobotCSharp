@@ -1,6 +1,7 @@
-﻿namespace DerivSmartRobot.Models.DerivClasses;
-
-public class Subscription
+﻿namespace DerivSmartRobot.Models.DerivClasses
 {
-    public Guid Id { get; set; }
+    public class Subscription
+    {
+        public Guid Id { get; set; }
+    }
 }

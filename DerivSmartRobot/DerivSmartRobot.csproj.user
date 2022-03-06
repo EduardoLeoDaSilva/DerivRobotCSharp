@@ -2,7 +2,13 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
+    <Compile Update="Pages\Browser.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Pages\Components\LogPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Pages\Components\MessageBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Pages\Config.cs">

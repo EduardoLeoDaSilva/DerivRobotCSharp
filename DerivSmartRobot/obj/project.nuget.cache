@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "S2ZyngLuC0qNOeH+X8RiJhFneOeduGHIbNp3S6Yz3J7GWLXyzp9eGUvz+Y1qhLz1aDC7D8YZuB2QmJNFMdNFbg==",
+  "dgSpecHash": "VlYKGi1UHaf/tqhH2SxAu9Yz6X5l6yjG5rQENRLez9DOihgvMorFEL7Eur1N96GnfezeIUS3vujE8mLlPp2X+w==",
   "success": true,
   "projectFilePath": "C:\\Users\\Eduardo\\RiderProjects\\DerivSmartRobot\\DerivSmartRobot\\DerivSmartRobot.csproj",
   "expectedPackageFiles": [
@@ -59,6 +59,7 @@
     "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration.templating\\6.0.1\\microsoft.visualstudio.web.codegeneration.templating.6.0.1.nupkg.sha512",
     "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration.utils\\6.0.1\\microsoft.visualstudio.web.codegeneration.utils.6.0.1.nupkg.sha512",
     "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.visualstudio.web.codegenerators.mvc\\6.0.1\\microsoft.visualstudio.web.codegenerators.mvc.6.0.1.nupkg.sha512",
+    "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.web.webview2\\0.9.579-prerelease\\microsoft.web.webview2.0.9.579-prerelease.nupkg.sha512",
     "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.win32.primitives\\4.3.0\\microsoft.win32.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
     "C:\\Users\\Eduardo\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0\\microsoft.win32.systemevents.5.0.0.nupkg.sha512",

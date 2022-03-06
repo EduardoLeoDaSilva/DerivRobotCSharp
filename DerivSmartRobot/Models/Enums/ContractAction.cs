@@ -1,7 +1,8 @@
-﻿namespace DerivSmartRobot.Domain.Enums;
-
-public enum ContractAction
+﻿namespace DerivSmartRobot.Domain.Enums
 {
-    Sell,
-    Buy
+    public enum ContractAction
+    {
+        Sell,
+        Buy
+    }
 }

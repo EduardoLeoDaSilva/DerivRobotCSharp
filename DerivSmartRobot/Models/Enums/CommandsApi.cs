@@ -1,13 +1,15 @@
-﻿namespace DerivSmartRobot.Domain.Enums;
-
-public enum CommandsApi
+﻿namespace DerivSmartRobot.Domain.Enums
 {
-    TransactionStream,
-    Authorize,
-    TickStream,
-    AvailableMarkets,
-    Buy,
-    Proposal,
-    OlhcStream,
-    Candles
+    public enum CommandsApi
+    {
+        TransactionStream,
+        Authorize,
+        TickStream,
+        AvailableMarkets,
+        Buy,
+        Proposal,
+        OlhcStream,
+        Candles,
+        Balance
+    }
 }

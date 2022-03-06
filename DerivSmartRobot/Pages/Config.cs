@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DerivSmartRobot.Domain.Enums;
 using DerivSmartRobot.Models.Classes;
+using DerivSmartRobot.Models.View;
 using DerivSmartRobot.Services;
 using Newtonsoft.Json;
 
@@ -19,10 +20,15 @@ namespace DerivSmartRobot.Pages
 
         private readonly ITradeService _tradeService;
         private readonly IHostedService _hostedService;
-        public Config(ITradeService tradeService, IHostedService hostedService)
+        private readonly IServiceProvider _serviceProvider;
+        private readonly User _user;
+        public Config(ITradeService tradeService, IHostedService hostedService, IServiceProvider serviceProvider,
+            User user)
         {
             _tradeService = tradeService;
             _hostedService = hostedService;
+            _serviceProvider = serviceProvider;
+            _user = user;
             InitializeComponent();
             InitializeVariables();
         }
@@ -39,7 +45,15 @@ namespace DerivSmartRobot.Pages
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //if (accountTypeBox.SelectedItem.ToString() == AccountType.Demo.ToString())
+            //{
+            //    apiTokenTextBox.Text = _user.ApiTokenDemo;
+            //}
+            //else if (accountTypeBox.SelectedItem.ToString() == AccountType.Real.ToString())
+            //{
+            //    apiTokenTextBox.Text = _user.ApiTokenReal;
 
+            //}
         }
 
         private void InitializeVariables()
@@ -49,15 +63,35 @@ namespace DerivSmartRobot.Pages
             var marketJsonObject = JsonConvert.DeserializeObject<List<dynamic>>(marketsjsonString);
 
             foreach (var x in marketJsonObject) mercadosCombo.Items.Add(x.display_name);
-            tipoMartingGaleCombo.Items.AddRange(Enum.GetValues<MartingaleType>().Select(x => (object) x.ToString()).ToArray());
+            tipoMartingGaleCombo.Items.AddRange(Enum.GetValues<MartingaleType>().Select(x => (object)x.ToString()).ToArray());
 
-            robosCombo.Items.AddRange(Enum.GetValues<RobotType>().Select(x => (object)x.ToString()).ToArray());
+            var robosDisponiveisUsuario = Enum.GetValues<RobotType>().Where(x => _user.Robots.Contains(x.GetHashCode().ToString()))
+                .Select(x => (object)x.ToString()).ToArray();
+            robosCombo.Items.AddRange(robosDisponiveisUsuario);
+            var accountsWithToken = JsonConvert.DeserializeObject<Dictionary<string, string>>(_user.TokensOAuth);
+
+
+            accountTypeBox.Items.AddRange(accountsWithToken.Keys.Select(x => (object)x).ToArray());
+
+            accountTypeBox.SelectedItem = accountsWithToken.Keys.First();
+
+
+
+            robosCombo.DropDownStyle = ComboBoxStyle.DropDownList;
+            tipoMartingGaleCombo.DropDownStyle = ComboBoxStyle.DropDownList;
+            mercadosCombo.DropDownStyle = ComboBoxStyle.DropDownList;
+            accountTypeBox.DropDownStyle = ComboBoxStyle.DropDownList;
 
         }
 
 
         private async void IniciarBtn_Click(object sender, EventArgs e)
         {
+
+            var authService = _serviceProvider.GetRequiredService<IAuthService>();
+
+
+
             var marketsjsonString =
                "[{\"allow_forward_starting\":0,\"display_name\":\"AUDIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"smart_fx\",\"submarket_display_name\":\"SmartFX\",\"symbol\":\"WLDAUD\",\"symbol_type\":\"smart_fx\"},{\"allow_forward_starting\":0,\"display_name\":\"AUD\\/CAD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxAUDCAD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"AUD\\/CHF\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxAUDCHF\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"AUD\\/JPY\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxAUDJPY\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"AUD\\/NZD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxAUDNZD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"AUD\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxAUDUSD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"AustralianIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"asia_oceania_OTC\",\"submarket_display_name\":\"Asia\\/Oceania\",\"symbol\":\"OTC_AS51\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"BTC\\/USD\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"cryptocurrency\",\"market_display_name\":\"Cryptocurrencies\",\"pip\":0.001,\"submarket\":\"non_stable_coin\",\"submarket_display_name\":\"Cryptocurrencies\",\"symbol\":\"cryBTCUSD\",\"symbol_type\":\"cryptocurrency\"},{\"allow_forward_starting\":0,\"display_name\":\"BearMarketIndex\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.0001,\"submarket\":\"random_daily\",\"submarket_display_name\":\"DailyResetIndices\",\"symbol\":\"RDBEAR\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Boom300Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"crash_index\",\"submarket_display_name\":\"Crash\\/BoomIndices\",\"symbol\":\"BOOM300N\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"Boom500Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"crash_index\",\"submarket_display_name\":\"Crash\\/BoomIndices\",\"symbol\":\"BOOM500\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"Boom1000Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"crash_index\",\"submarket_display_name\":\"Crash\\/BoomIndices\",\"symbol\":\"BOOM1000\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"BullMarketIndex\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.0001,\"submarket\":\"random_daily\",\"submarket_display_name\":\"DailyResetIndices\",\"symbol\":\"RDBULL\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Crash300Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"crash_index\",\"submarket_display_name\":\"Crash\\/BoomIndices\",\"symbol\":\"CRASH300N\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"Crash500Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"crash_index\",\"submarket_display_name\":\"Crash\\/BoomIndices\",\"symbol\":\"CRASH500\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"Crash1000Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"crash_index\",\"submarket_display_name\":\"Crash\\/BoomIndices\",\"symbol\":\"CRASH1000\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"DutchIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"europe_OTC\",\"submarket_display_name\":\"Europe\",\"symbol\":\"OTC_AEX\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"ETH\\/USD\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"cryptocurrency\",\"market_display_name\":\"Cryptocurrencies\",\"pip\":0.00001,\"submarket\":\"non_stable_coin\",\"submarket_display_name\":\"Cryptocurrencies\",\"symbol\":\"cryETHUSD\",\"symbol_type\":\"cryptocurrency\"},{\"allow_forward_starting\":0,\"display_name\":\"EURIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"smart_fx\",\"submarket_display_name\":\"SmartFX\",\"symbol\":\"WLDEUR\",\"symbol_type\":\"smart_fx\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/AUD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxEURAUD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/CAD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxEURCAD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/CHF\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxEURCHF\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/GBP\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxEURGBP\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/JPY\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxEURJPY\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/NZD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxEURNZD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"EUR\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxEURUSD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"Euro50Index\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"europe_OTC\",\"submarket_display_name\":\"Europe\",\"symbol\":\"OTC_SX5E\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"FrenchIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"europe_OTC\",\"submarket_display_name\":\"Europe\",\"symbol\":\"OTC_FCHI\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"GBPIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"smart_fx\",\"submarket_display_name\":\"SmartFX\",\"symbol\":\"WLDGBP\",\"symbol_type\":\"smart_fx\"},{\"allow_forward_starting\":0,\"display_name\":\"GBP\\/AUD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxGBPAUD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"GBP\\/CAD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxGBPCAD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"GBP\\/CHF\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxGBPCHF\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"GBP\\/JPY\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxGBPJPY\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"GBP\\/NZD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxGBPNZD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"GBP\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxGBPUSD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"GermanIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"europe_OTC\",\"submarket_display_name\":\"Europe\",\"symbol\":\"OTC_GDAXI\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"GoldIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"smart_fx\",\"submarket_display_name\":\"SmartFX\",\"symbol\":\"WLDXAU\",\"symbol_type\":\"smart_fx\"},{\"allow_forward_starting\":0,\"display_name\":\"Gold\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"commodities\",\"market_display_name\":\"Commodities\",\"pip\":0.01,\"submarket\":\"metals\",\"submarket_display_name\":\"Metals\",\"symbol\":\"frxXAUUSD\",\"symbol_type\":\"commodities\"},{\"allow_forward_starting\":0,\"display_name\":\"HongKongIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"asia_oceania_OTC\",\"submarket_display_name\":\"Asia\\/Oceania\",\"symbol\":\"OTC_HSI\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"JapaneseIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"asia_oceania_OTC\",\"submarket_display_name\":\"Asia\\/Oceania\",\"symbol\":\"OTC_N225\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Jump10Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"jump_index\",\"submarket_display_name\":\"JumpIndices\",\"symbol\":\"JD10\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Jump25Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"jump_index\",\"submarket_display_name\":\"JumpIndices\",\"symbol\":\"JD25\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Jump50Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"jump_index\",\"submarket_display_name\":\"JumpIndices\",\"symbol\":\"JD50\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Jump75Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"jump_index\",\"submarket_display_name\":\"JumpIndices\",\"symbol\":\"JD75\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Jump100Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"jump_index\",\"submarket_display_name\":\"JumpIndices\",\"symbol\":\"JD100\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"NZD\\/JPY\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxNZDJPY\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"NZD\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxNZDUSD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"Palladium\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"commodities\",\"market_display_name\":\"Commodities\",\"pip\":0.01,\"submarket\":\"metals\",\"submarket_display_name\":\"Metals\",\"symbol\":\"frxXPDUSD\",\"symbol_type\":\"commodities\"},{\"allow_forward_starting\":0,\"display_name\":\"Platinum\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"commodities\",\"market_display_name\":\"Commodities\",\"pip\":0.01,\"submarket\":\"metals\",\"submarket_display_name\":\"Metals\",\"symbol\":\"frxXPTUSD\",\"symbol_type\":\"commodities\"},{\"allow_forward_starting\":0,\"display_name\":\"Silver\\/USD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"commodities\",\"market_display_name\":\"Commodities\",\"pip\":0.0001,\"submarket\":\"metals\",\"submarket_display_name\":\"Metals\",\"symbol\":\"frxXAGUSD\",\"symbol_type\":\"commodities\"},{\"allow_forward_starting\":0,\"display_name\":\"StepIndex\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.1,\"submarket\":\"step_index\",\"submarket_display_name\":\"StepIndices\",\"symbol\":\"stpRNG\",\"symbol_type\":\"\"},{\"allow_forward_starting\":0,\"display_name\":\"SwissIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"europe_OTC\",\"submarket_display_name\":\"Europe\",\"symbol\":\"OTC_SSMI\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"UKIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"europe_OTC\",\"submarket_display_name\":\"Europe\",\"symbol\":\"OTC_FTSE\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"USIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"americas_OTC\",\"submarket_display_name\":\"Americas\",\"symbol\":\"OTC_SPC\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"USTechIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"americas_OTC\",\"submarket_display_name\":\"Americas\",\"symbol\":\"OTC_NDX\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"USDIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"smart_fx\",\"submarket_display_name\":\"SmartFX\",\"symbol\":\"WLDUSD\",\"symbol_type\":\"smart_fx\"},{\"allow_forward_starting\":0,\"display_name\":\"USD\\/CAD\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxUSDCAD\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"USD\\/CHF\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.00001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxUSDCHF\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"USD\\/JPY\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.001,\"submarket\":\"major_pairs\",\"submarket_display_name\":\"MajorPairs\",\"symbol\":\"frxUSDJPY\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"USD\\/MXN\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.0001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxUSDMXN\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"USD\\/PLN\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"forex\",\"market_display_name\":\"Forex\",\"pip\":0.0001,\"submarket\":\"minor_pairs\",\"submarket_display_name\":\"MinorPairs\",\"symbol\":\"frxUSDPLN\",\"symbol_type\":\"forex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility10(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ10V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility10Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"R_10\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility25(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ25V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility25Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.001,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"R_25\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility50(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ50V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility50Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.0001,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"R_50\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility75(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ75V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility75Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.0001,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"R_75\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility100(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ100V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility100Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"R_100\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility200(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ200V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"Volatility300(1s)Index\",\"exchange_is_open\":1,\"is_trading_suspended\":0,\"market\":\"synthetic_index\",\"market_display_name\":\"SyntheticIndices\",\"pip\":0.01,\"submarket\":\"random_index\",\"submarket_display_name\":\"ContinuousIndices\",\"symbol\":\"1HZ300V\",\"symbol_type\":\"stockindex\"},{\"allow_forward_starting\":0,\"display_name\":\"WallStreetIndex\",\"exchange_is_open\":0,\"is_trading_suspended\":0,\"market\":\"indices\",\"market_display_name\":\"StockIndices\",\"pip\":0.01,\"submarket\":\"americas_OTC\",\"submarket_display_name\":\"Americas\",\"symbol\":\"OTC_DJI\",\"symbol_type\":\"stockindex\"}]";
             var operationInfo = new OperationInfo
@@ -85,6 +119,143 @@ namespace DerivSmartRobot.Pages
             };
 
 
+
+            //Validações
+
+            var isValid = true;
+
+            var listErros = new List<int>();
+
+            if (string.IsNullOrEmpty(robosCombo.Text))
+            {
+                roboErroLabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(1);
+            }
+            else
+            {
+                roboErroLabel.Text = "";
+                listErros.Remove(1);
+
+
+            }
+
+            if (string.IsNullOrEmpty(mercadosCombo.Text))
+            {
+                marketErroLabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(2);
+
+            }
+            else
+            {
+                marketErroLabel.Text = "";
+                listErros.Remove(2);
+
+
+            }
+
+            if (string.IsNullOrEmpty(this.stake.Text) ||
+                !decimal.TryParse(this.stake.Text.Replace('.', ','), out var stake))
+            {
+                stakeErroLabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(3);
+
+            }
+            else
+            {
+                stakeErroLabel.Text = "";
+                listErros.Remove(3);
+
+
+            }
+
+            if (string.IsNullOrEmpty(tipoMartingGaleCombo.Text))
+            {
+                typeMgErrorlabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(4);
+
+            }
+            else
+            {
+                typeMgErrorlabel.Text = "";
+                listErros.Remove(4);
+
+
+            }
+
+            if (tipoMartingGaleCombo.Text == "Normal" && (string.IsNullOrEmpty(mgBoxValue.Text) || !decimal.TryParse(mgBoxValue.Text.Replace('.', ','), out var martinga2)))
+            {
+                mgErrorLabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(5);
+
+            }
+            else
+            {
+                mgErrorLabel.Text = "";
+                listErros.Remove(5);
+
+
+            }
+
+            if (string.IsNullOrEmpty(stopWin.Text) || decimal.TryParse(stopWin.Text.Replace('.', ','), out var stopwin) == false)
+            {
+                stopWinErroLabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(6);
+
+            }
+            else
+            {
+                stopWinErroLabel.Text = "";
+                listErros.Remove(6);
+
+
+            }
+
+            if (string.IsNullOrEmpty(this.stopLoss.Text) || decimal.TryParse(this.stopLoss.Text.Replace('.', ','), out var stoploss) == false)
+            {
+                stopLossErroLabel.Text = "Campo inválido";
+                isValid = false;
+                listErros.Add(7);
+
+
+            }
+            else
+            {
+                stopLossErroLabel.Text = "";
+                listErros.Remove(7);
+
+            }
+
+
+
+            if (string.IsNullOrEmpty(accountTypeBox.Text))
+            {
+                erroTipoContaTextBox.Text = "Campo inválido";
+                listErros.Add(8);
+
+            }
+            else
+            {
+                erroTipoContaTextBox.Text = "";
+                listErros.Remove(8);
+
+            }
+
+            
+
+            if (listErros.Any())
+            {
+                return;
+            }
+
+            //await authService.SaveConfig(_user.Email, accountTypeBox.Text, apiTokenTextBox.Text);
+
+
             if (Enum.TryParse<RobotType>(robosCombo.SelectedItem.ToString(), out var robotType))
                 RobotConfig.RobotType = robotType;
             Console.WriteLine("Digite o mercado que quer trabalhar: ");
@@ -93,19 +264,18 @@ namespace DerivSmartRobot.Pages
             var marketJsonObject = JsonConvert.DeserializeObject<List<dynamic>>(marketsjsonString);
 
             RobotConfig.Market = marketJsonObject
-                .First(x => x.display_name.ToString() ==  mercadosCombo.SelectedItem.ToString()).symbol;
+                .First(x => x.display_name.ToString() == mercadosCombo.SelectedItem.ToString()).symbol;
 
-            if (decimal.TryParse(this.stake.Text.Replace('.',','), out var stake))
-                RobotConfig.Stake = stake;
-            else
-               ////
+            if (decimal.TryParse(this.stake.Text.Replace('.', ','), out var stake2))
+                RobotConfig.Stake = stake2;
+
 
             if (Enum.TryParse<MartingaleType>(tipoMartingGaleCombo.SelectedItem.ToString(), out var martingale))
                 RobotConfig.MartigaleType = martingale;
 
             if (RobotConfig.MartigaleType == MartingaleType.Normal)
             {
-                if (decimal.TryParse(mgBoxValue.Text.Replace('.',','), out var martinga))
+                if (decimal.TryParse(mgBoxValue.Text.Replace('.', ','), out var martinga))
                     RobotConfig.MartingaleValue = martinga;
             }
 
@@ -115,30 +285,21 @@ namespace DerivSmartRobot.Pages
             if (decimal.TryParse(this.stopLoss.Text, out var stopLoss))
                 RobotConfig.StopLoss = stopLoss;
 
-            //Console.WriteLine("Ativar sequencia maxima de loss? sim ou nao");
-            //var resposta = Console.ReadLine();
-            //if (resposta == "sim")
-            //{
-            //    Console.WriteLine("Digite a sequencia máxima de perdas");
-            //    if (int.TryParse(Console.ReadLine(), out var sequenciaPerdas))
-            //        RobotConfig.MaxLossSequence = sequenciaPerdas;
-
-
-            //    Console.WriteLine("Ativar sequencia de perdas após qual valor?");
-            //    if (decimal.TryParse(Console.ReadLine(), out var valorSequenciaPerdas))
-            //        RobotConfig.MaxLossSequenceAfterThisProfit = valorSequenciaPerdas;
-            //}
-
-
-
             try
             {
+                var accountsWithToken = JsonConvert.DeserializeObject<Dictionary<string, string>>(_user.TokensOAuth);
+                operationInfo.AccessToken = accountsWithToken.GetValueOrDefault(accountTypeBox.SelectedItem.ToString());
                 _tradeService.currentOperation = operationInfo;
                 _tradeService.RobotConfigutarion = RobotConfig;
 
 
                 await _hostedService.StartAsync(CancellationToken.None);
-                _tradeService.SetLos
+
+
+                this.Hide();
+                var dash = new Dash(_serviceProvider);
+                dash.Closed += (s, args) => this.Close();
+                dash.Show();
 
             }
             catch (Exception ex)
@@ -152,6 +313,22 @@ namespace DerivSmartRobot.Pages
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void label9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void closeBtn_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+
+        }
+
+        private void minimizeBtn_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
     }
 }

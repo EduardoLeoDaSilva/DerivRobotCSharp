@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace DerivSmartRobot.Models.DerivClasses;
-
-public class Contract
+namespace DerivSmartRobot.Models.DerivClasses
 {
+    public class Contract
+    {
         [JsonProperty("proposal")]
         public int?  Proposal  { get; set; }
         [JsonProperty("amount")]
@@ -22,4 +22,5 @@ public class Contract
         public string? Duration_unit  { get; set; }
         [JsonProperty("symbol")]
         public string? Symbol { get; set; }
+    }
 }

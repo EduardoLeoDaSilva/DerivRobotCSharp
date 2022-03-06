@@ -1,6 +1,5 @@
-﻿namespace DerivSmartRobot.Models.DerivClasses;
-
-
+﻿namespace DerivSmartRobot.Models.DerivClasses
+{
     public class BuyResponse
     {
         public double balance_after { get; set; }
@@ -13,4 +12,5 @@
         public int start_time { get; set; }
         public long transaction_id { get; set; }
     }
+}
 

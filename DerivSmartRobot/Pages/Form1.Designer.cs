@@ -27,53 +27,41 @@ namespace DerivSmartRobot.Pages
 
         #region Windows Form Designer generated code
 
+
+        async Task InitializeAsync()
+        {
+            //await webView21.EnsureCoreWebView2Async(null);
+
+            //await webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.chrome.webview.postMessage(window.document.URL);");
+            //await webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.chrome.webview.addEventListener(\'message\', event => alert(event.data));");
+
+        }
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
+        ///
         /// 
-        private async void InitializeComponent()
+        /// 
+        private async  void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.button2 = new System.Windows.Forms.Button();
+            this.webView21 = new WebBrowser();
             this.SuspendLayout();
             // 
-            // button1
+            // webView21
             // 
-            this.button1.Location = new System.Drawing.Point(598, 297);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.Location = new System.Drawing.Point(428, 78);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(200, 100);
-            this.panel1.TabIndex = 1;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(380, 272);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.webView21.Location = new System.Drawing.Point(4, 1);
+            this.webView21.Name = "webView21";
+            this.webView21.Size = new System.Drawing.Size(844, 429);
+            this.webView21.Url = new System.Uri("https://www.google.com/?gws_rd=ssl", System.UriKind.Absolute);
+            this.webView21.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(850, 442);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.webView21);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -82,8 +70,7 @@ namespace DerivSmartRobot.Pages
 
         #endregion
 
-        private Button button1;
-        private Panel panel1;
-        private Button button2;
+        private WebBrowser webView21;
+
     }
 }

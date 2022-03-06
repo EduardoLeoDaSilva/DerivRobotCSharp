@@ -6,160 +6,161 @@ using DerivSmartRobot.Services;
 using Newtonsoft.Json;
 using Skender.Stock.Indicators;
 
-namespace DerivSmartRobot.Robots;
-
-public class MarubuzuRobot : BaseRobot, IRobotOperations, IMarubuzuRobot
+namespace DerivSmartRobot.Robots
 {
-    private readonly ITradeService _tradeService;
-
-    public string Action { get; set; } = "";
-    public int QuantConfirmationSginals { get; set; } = 0;
-
-    public string LastSignal { get; set; } = "";
-
-    public decimal? LastCandlePrice { get; set; } = null;
-
-    public MarubuzuRobot(ITradeService tradeService)
+    public class MarubuzuRobot : BaseRobot, IRobotOperations, IMarubuzuRobot
     {
-        _tradeService = tradeService;
-    }
-    public override void VerifyAndBuy(ResponseMessage message)
-    {
-        
-        var quote = this.BuildQuoteModel(message);
-        Quotes.Add(quote);
-        
-        IEnumerable<Quote> minuteBarQuotes =
-            Quotes.Aggregate(TimeSpan.FromSeconds(5));
+        private readonly ITradeService _tradeService;
 
-        var emaResults = minuteBarQuotes.GetEma(100);
+        public string Action { get; set; } = "";
+        public int QuantConfirmationSginals { get; set; } = 0;
 
-        var candleResults = minuteBarQuotes.GetMarubozu();
+        public string LastSignal { get; set; } = "";
 
-        var stochRsi = minuteBarQuotes.GetRsi();
+        public decimal? LastCandlePrice { get; set; } = null;
 
-        var ema = minuteBarQuotes.GetEma(100);
-
-        //if (string.IsNullOrEmpty(Action) && stochRsi.Last().Rsi >= 70)
-        //{
-        //    Action = "sell";
-        //}
-
-        //if (string.IsNullOrEmpty(Action) && stochRsi.Last().Rsi <= 30)
-        //{
-        //    Action = "buy";
-
-        //}
-
-
-        var lastCandle = candleResults.Last();
-
-
-
-
-        if (lastCandle.Signal == Signal.BearSignal)
+        public MarubuzuRobot(ITradeService tradeService):base(tradeService)
         {
-
-            if (QuantConfirmationSginals < 4)
-            {
-                QuantConfirmationSginals += 1;
-                LastSignal = "Bear";
-            }
-
-            if (QuantConfirmationSginals >= 4 && LastSignal == "Bear")
-            {
-
-                if (LastCandlePrice == null)
-                {
-                    LastCandlePrice = lastCandle.Price;
-                }
-                else
-                {
-                    if (lastCandle.Price > LastCandlePrice )
-                    {
-                        Console.WriteLine("Marubuzu");
-
-                        this.MakeAProposal(ContractType.PUT, 5, "t");
-                        QuantConfirmationSginals = 0;
-                        LastCandlePrice = null;
-                        LastSignal = "";
-                    }
-                    else
-                    {
-                        QuantConfirmationSginals = 0;
-                        LastCandlePrice = null;
-                        LastSignal = "";
-                    }
-                }
-
-
-            }
-            Action = "";
-
+            _tradeService = tradeService;
         }
-        if (lastCandle.Signal == Signal.BullSignal)
+        public override void VerifyAndBuy(ResponseMessage message)
         {
-            if (QuantConfirmationSginals < 4)
-            {
-                QuantConfirmationSginals += 1;
-                LastSignal = "Bull";
-            }
+        
+            var quote = this.BuildQuoteModel(message);
+            Quotes.Add(quote);
+        
+            IEnumerable<Quote> minuteBarQuotes =
+                Quotes.Aggregate(TimeSpan.FromSeconds(5));
 
-            if (QuantConfirmationSginals >= 4 && LastSignal == "Bull")
+            var emaResults = minuteBarQuotes.GetEma(100);
+
+            var candleResults = minuteBarQuotes.GetMarubozu();
+
+            var stochRsi = minuteBarQuotes.GetRsi();
+
+            var ema = minuteBarQuotes.GetEma(100);
+
+            //if (string.IsNullOrEmpty(Action) && stochRsi.Last().Rsi >= 70)
+            //{
+            //    Action = "sell";
+            //}
+
+            //if (string.IsNullOrEmpty(Action) && stochRsi.Last().Rsi <= 30)
+            //{
+            //    Action = "buy";
+
+            //}
+
+
+            var lastCandle = candleResults.Last();
+
+
+
+
+            if (lastCandle.Signal == Signal.BearSignal)
             {
 
-                if (LastCandlePrice == null)
+                if (QuantConfirmationSginals < 4)
                 {
-                    LastCandlePrice = lastCandle.Price;
+                    QuantConfirmationSginals += 1;
+                    LastSignal = "Bear";
                 }
-                else
+
+                if (QuantConfirmationSginals >= 4 && LastSignal == "Bear")
                 {
-                    if (lastCandle.Price < LastCandlePrice )
+
+                    if (LastCandlePrice == null)
                     {
-                        Console.WriteLine("Marubuzu");
-
-                        this.MakeAProposal(ContractType.CALL, 5, "t");
-                        QuantConfirmationSginals = 0;
-                        LastCandlePrice = null;
-                        LastSignal = "";
-
+                        LastCandlePrice = lastCandle.Price;
                     }
                     else
                     {
-                        QuantConfirmationSginals = 0;
-                        LastCandlePrice = null;
-                        LastSignal = "";
+                        if (lastCandle.Price > LastCandlePrice )
+                        {
+                            Console.WriteLine("Marubuzu");
+
+                            this.MakeAProposal(ContractType.PUT, 5, "t");
+                            QuantConfirmationSginals = 0;
+                            LastCandlePrice = null;
+                            LastSignal = "";
+                        }
+                        else
+                        {
+                            QuantConfirmationSginals = 0;
+                            LastCandlePrice = null;
+                            LastSignal = "";
+                        }
                     }
+
+
                 }
+                Action = "";
+
+            }
+            if (lastCandle.Signal == Signal.BullSignal)
+            {
+                if (QuantConfirmationSginals < 4)
+                {
+                    QuantConfirmationSginals += 1;
+                    LastSignal = "Bull";
+                }
+
+                if (QuantConfirmationSginals >= 4 && LastSignal == "Bull")
+                {
+
+                    if (LastCandlePrice == null)
+                    {
+                        LastCandlePrice = lastCandle.Price;
+                    }
+                    else
+                    {
+                        if (lastCandle.Price < LastCandlePrice )
+                        {
+                            Console.WriteLine("Marubuzu");
+
+                            this.MakeAProposal(ContractType.CALL, 5, "t");
+                            QuantConfirmationSginals = 0;
+                            LastCandlePrice = null;
+                            LastSignal = "";
+
+                        }
+                        else
+                        {
+                            QuantConfirmationSginals = 0;
+                            LastCandlePrice = null;
+                            LastSignal = "";
+                        }
+                    }
 
                
-            }
-            Action = "";
+                }
+                Action = "";
 
+            }
+
+
+
+            //if (emaResults.Last().Ema > minuteBarQuotes.Last().Close && lastCandle.Signal == Signal.BearSignal && Action == "sell")
+            //{
+            //    this.MakeAProposal(ContractType.PUT, 2, "t");
+            //    Action = "";
+
+            //}
+            //if (emaResults.Last().Ema < minuteBarQuotes.Last().Close && lastCandle.Signal == Signal.BullSignal && Action == "buy")
+            //{
+            //    this.MakeAProposal(ContractType.CALL, 2, "t");
+            //    Action = "";
+
+            //}
         }
 
-
-
-        //if (emaResults.Last().Ema > minuteBarQuotes.Last().Close && lastCandle.Signal == Signal.BearSignal && Action == "sell")
-        //{
-        //    this.MakeAProposal(ContractType.PUT, 2, "t");
-        //    Action = "";
-
-        //}
-        //if (emaResults.Last().Ema < minuteBarQuotes.Last().Close && lastCandle.Signal == Signal.BullSignal && Action == "buy")
-        //{
-        //    this.MakeAProposal(ContractType.CALL, 2, "t");
-        //    Action = "";
-
-        //}
+        private void MakeAProposal(ContractType contract, int duration, string durationUnit)
+        {
+            _tradeService.MakeAProposal(contract, duration, durationUnit);
+        }
     }
 
-    private void MakeAProposal(ContractType contract, int duration, string durationUnit)
+    public interface IMarubuzuRobot : IRobotOperations
     {
-        _tradeService.MakeAProposal(contract, duration, durationUnit);
     }
-}
-
-public interface IMarubuzuRobot : IRobotOperations
-{
 }

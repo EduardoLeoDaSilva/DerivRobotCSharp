@@ -1,6 +1,7 @@
-﻿namespace DerivSmartRobot.Models.Classes;
-
-public class InitialConfiguration
+﻿namespace DerivSmartRobot.Models.Classes
 {
-    public string Token { get; set; }
+    public class InitialConfiguration
+    {
+        public string Token { get; set; }
+    }
 }

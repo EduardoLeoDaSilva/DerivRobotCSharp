@@ -226,7 +226,14 @@ C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-windows\DerivSmartRobot.Redis.dll
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-windows\DerivSmartRobot.Redis.pdb
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.csproj.AssemblyReference.cache
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Browser.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Components.LogPanel.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Components.MessageBox.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Config.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Dash.resources
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Form1.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Login.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Properties.Resources.resources
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.csproj.GenerateResource.cache
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.AssemblyInfoInputs.cache
@@ -240,8 +247,7 @@ C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\ref\DerivSmartRobot.dll
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.pdb
 C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.genruntimeconfig.cache
-C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Components.LogPanel.resources
-C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Config.resources
-C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Dash.resources
-C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Pages.Login.resources
-C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\obj\Debug\net6.0-windows\DerivSmartRobot.Properties.Resources.resources
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-windows\WebView2Loader.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-windows\Microsoft.Web.WebView2.Core.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-windows\Microsoft.Web.WebView2.WinForms.dll
+C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Debug\net6.0-windows\Microsoft.Web.WebView2.Wpf.dll
