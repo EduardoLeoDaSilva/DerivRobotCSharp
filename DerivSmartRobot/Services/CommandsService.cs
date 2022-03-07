@@ -87,7 +87,7 @@ namespace DerivSmartRobot.Services
                     {
                         ticks_history = data.Market,
                         adjust_start_time = 1,
-                        count = 10000,
+                        count = 40000,
                         end = "latest",
                         start = 1,
                         style = "candles",
