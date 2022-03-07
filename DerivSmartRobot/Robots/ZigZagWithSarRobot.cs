@@ -104,7 +104,8 @@ namespace DerivSmartRobot.Robots
             if (fractalResults.Last().FractalBull != null && ZigZagDirection == "up" &&
                 LastFractal != fractalResults.Last().Date)
             {
-                if (candles.TakeLast(2).First().IsBullish)
+                if (candles.TakeLast(2).First().IsBullish && candles.Last().IsBearish &&
+                    candles.Last().BodyPct > 0.20 && candles.Last().Body > (decimal) 0.50 && Quotes.Last().Close > Quotes.TakeLast(2).First().Close) 
                 {
                     _tradeService.Log.Log += $";Realizando compra UP";
                     this.MakeAProposal(ContractType.CALL, 2, "m");
@@ -115,7 +116,8 @@ namespace DerivSmartRobot.Robots
             if (fractalResults.Last().FractalBear != null && ZigZagDirection == $"down" &&
                 LastFractal != fractalResults.Last().Date)
             {
-                if (candles.TakeLast(2).First().IsBearish)
+                if (candles.TakeLast(2).First().IsBearish && candles.Last().IsBullish &&
+                    candles.Last().BodyPct > 0.20 && candles.Last().Body > (decimal)0.50 && Quotes.Last().Close < Quotes.TakeLast(2).First().Close)
                 {
                     _tradeService.Log.Log += $";Realizando compra DOWN";
                     this.MakeAProposal(ContractType.PUT, 2, "m");
