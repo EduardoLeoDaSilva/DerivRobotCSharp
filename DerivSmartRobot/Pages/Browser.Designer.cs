@@ -70,10 +70,9 @@ namespace DerivSmartRobot.Pages
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(214)))), ((int)(((byte)(223)))));
-            this.ClientSize = new System.Drawing.Size(366, 95);
+            this.ClientSize = new System.Drawing.Size(522, 95);
             this.Controls.Add(this.label1);
             this.ForeColor = System.Drawing.Color.DarkSlateBlue;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Browser";
             this.Text = "Browser";
             this.Closed += new System.EventHandler(this.onClosed);

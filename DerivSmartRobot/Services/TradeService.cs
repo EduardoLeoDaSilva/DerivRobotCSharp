@@ -13,7 +13,7 @@ namespace DerivSmartRobot.Services
         public RobotConfigutarion RobotConfigutarion { get; set; }
 
         private readonly IClientDeriv _client;
-        public bool IsOperating { get; set; } = false;
+        public bool HasOpenContract { get; set; } = false;
 
         public List<Quote> QuotesCached { get; set; }
 
@@ -28,6 +28,7 @@ namespace DerivSmartRobot.Services
         public OperationView Operation { get; set; }
 
         public LogView Log { get; set; }
+        public Guid CandleSubscriptionId { get; set; }
 
         public TradeService(IClientDeriv client)
         {
@@ -44,8 +45,10 @@ namespace DerivSmartRobot.Services
 
         public bool MakeAProposal(ContractType contractType, int duration, string durationUnit, string? barrier = null)
         {
-            if (IsOperating)
+            if (HasOpenContract)
                 return true;
+
+            HasOpenContract = true;
 
             var amount = Convert.ToDecimal(string.Format("{0:F2}", currentOperation.NewAmount != 0 ? currentOperation.NewAmount : RobotConfigutarion.Stake));
             var contract = CommandsService.GetCommands(CommandsApi.Proposal,
@@ -56,9 +59,6 @@ namespace DerivSmartRobot.Services
             LastDurationType = durationUnit == "t" ? "Tick" : durationUnit == "s" ? "Segundos" : durationUnit == "m" ? "Minuto" : "";
             LastDuration = duration;
 
-
-            currentOperation.LastValueLost = amount;
-            IsOperating = true;
             _client.SendCommand(contract);
 
             return true;
@@ -81,7 +81,6 @@ namespace DerivSmartRobot.Services
             }
 
             Log = new LogView {Date = DateTime.Now, Log = "Realizando compra"};
-
             var buy = CommandsService.GetCommands(CommandsApi.Buy, proposal);
             _client.SendCommand(buy);
             return true;
@@ -89,38 +88,25 @@ namespace DerivSmartRobot.Services
 
         public void UpdateOperationInfoValues(ResponseMessage responseMessage)
         {
-            if (responseMessage.Transaction.TransactionId is 0)
-                return;
-            if (responseMessage.Transaction.Action == ContractAction.Buy)
-            {
-                Operation = new OperationView
-                {
-                    ContractId = responseMessage.Transaction.ContractId.ToString(),
-                    Market = responseMessage.Transaction.DisplayName,
-                    Contract = LastContractBought,
-                    Amount = responseMessage.Transaction.Amount,
-                    Action = responseMessage.Transaction.Action,
-                    Duration = LastDuration,
-                    DurationType = LastDurationType,
-                    Profit = 0
-                };
-                return;
-            }
-            else
-            {
-                Operation = new OperationView
-                {
-                    ContractId = responseMessage.Transaction.ContractId.ToString(),
-                    Market = responseMessage.Transaction.DisplayName,
-                    Contract = LastContractBought,
-                    Amount = currentOperation.LastValueLost,
-                    Action = responseMessage.Transaction.Action,
-                    Duration = LastDuration,
-                    DurationType = LastDurationType,
-                    Profit = 0
-                };
-            }
 
+            
+            Operation = new OperationView
+            {
+                ContractId = responseMessage.OpenContract.ContractId.ToString(),
+                Market = responseMessage.OpenContract.DisplayName,
+                Contract = LastContractBought,
+                Amount = (decimal)responseMessage.OpenContract.BuyPrice,
+                Duration = LastDuration,
+                DurationType = LastDurationType,
+                Profit = (decimal)responseMessage.OpenContract.Profit,
+                Expiration = UnixTimeStampToDateTime(responseMessage.OpenContract.ExpiryTime),
+                Status = "open"
+
+            };
+
+
+            
+            
 
             if (currentOperation.LossToRecover > 0 && RobotConfigutarion.CalledFrom != null)
             {
@@ -128,39 +114,69 @@ namespace DerivSmartRobot.Services
                 RobotConfigutarion.CalledFrom = null;
             }
 
-            if (responseMessage.Transaction.Amount == 0)
+            if (responseMessage.OpenContract.Status == "lost" || (responseMessage.OpenContract.Status == "sold" &&
+                                                                  responseMessage.OpenContract.Profit < 0)
+                                                              || (responseMessage.OpenContract.IsExpired  &&
+                                                                  responseMessage.OpenContract.Profit < 0))
             {
-                Operation.Profit = currentOperation.LastValueLost *-1;
+                Operation.Profit = (decimal)responseMessage.OpenContract.Profit;
                 Operation.Action = ContractAction.Sell;
+                Operation.Status = "lost";
+                currentOperation.LastValueLost = (decimal)responseMessage.OpenContract.Profit *-1;
+
 
                 currentOperation.QuantLoss += 1;
                 currentOperation.LossToRecover += currentOperation.LastValueLost;
-                currentOperation.CurrentOperationBalance += currentOperation.LastValueLost * -1;
+                currentOperation.CurrentOperationBalance += currentOperation.LastValueLost *-1;
+                _client.Forget(responseMessage.Subscription.Id.ToString());
+                HasOpenContract = false;
+                return;
             }
-
-            if (responseMessage.Transaction.Amount > 0)
+            else if (responseMessage.OpenContract.Status == "won" || (responseMessage.OpenContract.Status == "sold" &&
+                                                                      responseMessage.OpenContract.Profit > 0)
+                                                                  || (responseMessage.OpenContract.IsExpired &&
+                                                                      responseMessage.OpenContract.Profit > 0))
             {
                 currentOperation.QuantWin += 1;
                 currentOperation.LossToRecover = 0;
-                currentOperation.CurrentOperationBalance += responseMessage.Transaction.Amount - currentOperation.LastValueLost;
-                Operation.Profit = responseMessage.Transaction.Amount - currentOperation.LastValueLost;
-                Operation.Action = ContractAction.Sell;
+                Operation.Status = "won";
 
+                currentOperation.CurrentOperationBalance += (decimal)responseMessage.OpenContract.Profit;
+                Operation.Profit = (decimal) responseMessage.OpenContract.Profit;
+                Operation.Action = ContractAction.Sell;
                 currentOperation.LastValueLost = 0;
+                _client.Forget(responseMessage?.Subscription?.Id.ToString());
+                HasOpenContract = false;
+                return;
             }
 
-            currentOperation.RobotAccuracy = (currentOperation.QuantWin * 100) /
-                                             (currentOperation.QuantLoss + currentOperation.QuantWin);
+            try
+            {
+                currentOperation.RobotAccuracy = (currentOperation.QuantWin * 100) /
+                                                 (currentOperation.QuantLoss + currentOperation.QuantWin);
+            }
+            catch (Exception e)
+            {
+             
+
+                Console.WriteLine(e);
+            }
+
+            
+            if ((responseMessage.OpenContract.ProfitPercentage > 80 || responseMessage.OpenContract.ProfitPercentage < -20) && responseMessage.OpenContract.IsValidToSell)
+            {
+                _client.Sell(responseMessage.OpenContract.ContractId, responseMessage.OpenContract.Profit + responseMessage.OpenContract.BuyPrice);
+                return;
+            }
+        }
 
 
-
-
-
-            Console.WriteLine("Wins   Loss     %Ac     OperationBalance");
-
-            Console.WriteLine($"{currentOperation.QuantWin}        {currentOperation.QuantLoss}            {currentOperation.RobotAccuracy}          {currentOperation.CurrentOperationBalance}  ");
-
-
+        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dateTime;
         }
 
         public ModelToView GetOperations()
@@ -177,7 +193,9 @@ namespace DerivSmartRobot.Services
                     Contract = Operation.Contract,
                     Profit = Operation.Profit,
                     Duration = Operation.Duration,
-                    DurationType = Operation.DurationType
+                    DurationType = Operation.DurationType,
+                    Expiration = Operation.Expiration,
+                    Status = Operation.Status
                 },
                 RobotConfigutarion = this.RobotConfigutarion,
                 OperationInfo = this.currentOperation,
@@ -196,6 +214,11 @@ namespace DerivSmartRobot.Services
             _client.UnsubscribeSucessEvents();
             _client.UnsubscribeErrosEvents();
             _client.Stop();
+        }
+
+        public void SubscribeOpenContract(ResponseMessage responseMessage)
+        {
+            _client.SubscribeOpenContract(responseMessage);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DerivSmartRobot.Services;
+﻿using DerivSmartRobot.Models.View;
+using DerivSmartRobot.Services;
 
 namespace DerivSmartRobot
 {
@@ -16,18 +17,20 @@ namespace DerivSmartRobot
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Iniciando");
+            _tradeService.Log = new LogView {Date = DateTime.Now, Log = "Iniciando robô"};
             _client.SetConfigurations("31306", _tradeService.currentOperation.AccessToken);
-            _client.Connect();
-            _client.Authorize();
-            await Task.Delay(2000);
-            // await _client.GetMarketQuote(_tradeService.RobotConfigutarion.Market);
-            _client.GetCandlesStream(_tradeService.RobotConfigutarion.Market, 60); //todo mudar dpois
-            _client.GetTransactionStream();
-            _client.GetBalanceStream();
-
             _client.SubscribeSucessEvents();
             _client.SubscribeErroEvents();
+            _client.Connect();
+            _client.Authorize();
+
+            // await Task.Delay(2000);
+            // await _client.GetMarketQuote(_tradeService.RobotConfigutarion.Market);
+            // _client.GetCandlesStream(_tradeService.RobotConfigutarion.Market, 60, true); //todo mudar dpois
+            //_client.GetTransactionStream();
+            // _client.GetBalanceStream();
+
+
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

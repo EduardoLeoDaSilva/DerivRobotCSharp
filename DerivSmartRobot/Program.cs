@@ -26,8 +26,8 @@ internal static class Program
         var services = new ServiceCollection();
         ConfigureServices(services);
 
-        var serviceProvider = services
-            .AddLogging().BuildServiceProvider();
+        var serviceProvider = ServiceCollectionContainerBuilderExtensions.BuildServiceProvider(services
+            .AddLogging());
 
         Application.SetHighDpiMode(HighDpiMode.SystemAware);
         Application.EnableVisualStyles();
@@ -48,17 +48,12 @@ internal static class Program
         services.AddSingleton<ITradeService, TradeService>();
         services.AddSingleton<HostedService>();
 
-        services.AddSingleton<IRsiRobot, RsiRobot>();
-        services.AddSingleton<IRsiFractalRobot, RsiFractalRobot>();
+        services.AddSingleton<ITendencyWithAiRobot, TendencyWithAi>();
+        services.AddSingleton<IDigitAiPrediction, DigitAiPrediction>();
+        services.AddSingleton<IFractalRobot, FractalRobot>();
 
-        services.AddSingleton<IRsiMacdRobot, RsiMacdRobot>();
-        services.AddSingleton<IMacdRobot, MacdRobot>();
-        services.AddSingleton<IDigitRobotRobot, DigitRobot>();
-        services.AddSingleton<ISmaAndWmaGoRobot, SmaAndWmaGoRobot>();
-        services.AddSingleton<IMarubuzuRobot, MarubuzuRobot>();
-        services.AddSingleton<IRsiStockHigherAndLowerRobot, RsiStockHigherAndLowerRobot>();
-        services.AddSingleton<ICandleMiniReversalStrategyRobot, CandleMiniReversalStrategyRobot>();
-        services.AddSingleton<IZigZagWithSarRobot, ZigZagWithSarRobot>();
+
+        services.AddSingleton<AIService>();
 
 
         services.AddTransient<ReaderService>();

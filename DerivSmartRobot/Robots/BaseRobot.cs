@@ -16,24 +16,27 @@ namespace DerivSmartRobot.Robots
             this.tradeService = tradeService;
         }
 
+
+
         public List<Quote> Quotes { get; set; }
         public void  GetAmountWithMartingale(OperationInfo operationInfo, decimal martingale, MartingaleType martingaleType)
         {
 
-            if (operationInfo.LastValueLost == 0)
+            if (operationInfo.LastValueLost + operationInfo.LossToRecover <= 0.35M)
             {
                 operationInfo.NewAmount = 0;
                 return;
             }
         
+            
             if (martingaleType == MartingaleType.Normal)
             {
-                var newAmount = (operationInfo.LastValueLost * martingale) + operationInfo.LastValueLost;
+                var newAmount = ((operationInfo.LastValueLost + operationInfo.LossToRecover) * martingale) + operationInfo.LastValueLost;
                 operationInfo.NewAmount = newAmount;
             }
             else if(martingaleType == MartingaleType.Recover)
             {
-                var newAmount = operationInfo.LossToRecover + (decimal)0.10;
+                var newAmount = (operationInfo.LastValueLost + operationInfo.LossToRecover)+ (decimal)0.10;
                 operationInfo.NewAmount = newAmount;
             }
             else
@@ -82,13 +85,13 @@ namespace DerivSmartRobot.Robots
 
             }
 
-            if (nextStake >= stopLoss && !tradeService.IsOperating)
-            {
-                tradeService.Log.Log = "Stop Loss, parando robô";
-                this.StopOperation();
-                return true;
-
-            }
+            // if (nextStake >= stopLoss && !tradeService.IsOperating)
+            // {
+            //     tradeService.Log.Log = "Stop Loss, parando robô";
+            //     this.StopOperation();
+            //     return true;
+            //
+            // }
 
             return false;
 

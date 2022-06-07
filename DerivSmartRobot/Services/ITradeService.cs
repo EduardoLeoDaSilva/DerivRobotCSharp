@@ -10,11 +10,12 @@ namespace DerivSmartRobot.Services
     {
         OperationInfo currentOperation { get; set; }
         RobotConfigutarion RobotConfigutarion { get; set; }
-        public bool IsOperating { get; set; }
+        public bool HasOpenContract { get; set; } 
         public List<Quote> QuotesCached { get; set; }
         public OperationView Operation { get; set; }
 
         public LogView Log { get; set; }
+        public Guid CandleSubscriptionId { get; set; }
         bool SetConfigurationAndConnect(string token);
         bool MakeAProposal(ContractType contractType, int duration, string durationUnit, string? barrier = null);
         bool BuyAContract(Proposal proposal);
@@ -22,5 +23,6 @@ namespace DerivSmartRobot.Services
         ModelToView GetOperations();
         void UpdateBalance(ResponseMessage responseMessage);
         void StopOperation();
+        void SubscribeOpenContract(ResponseMessage responseMessage);
     }
 }

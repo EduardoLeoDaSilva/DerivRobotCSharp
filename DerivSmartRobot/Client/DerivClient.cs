@@ -1,6 +1,8 @@
 ﻿using System.Security.Authentication;
 using System.Text.Json;
 using DerivSmartRobot.Domain.Enums;
+using DerivSmartRobot.Models.DerivClasses;
+using Newtonsoft.Json;
 using WebSocketSharp;
 using ErrorEventArgs = WebSocketSharp.ErrorEventArgs;
 
@@ -23,10 +25,13 @@ namespace DerivSmartRobot.Services
         void UnsubscribeSucessEvents();
 
         void SendCommand(string command);
-        void GetCandlesStream(string market, int granularity);
+        void GetCandlesStream(string market, int granularity, bool subscribe = false);
         void GetBalanceStream();
+        void Forget(string id);
 
         void Stop();
+        void SubscribeOpenContract(ResponseMessage responseMessage);
+        void Sell(long openContractContractId, double openContractBuyPrice);
     }
 
     public class DerivClient : IClientDeriv
@@ -86,6 +91,29 @@ namespace DerivSmartRobot.Services
             _ws.Close();
         }
 
+        public void SubscribeOpenContract(ResponseMessage responseMessage)
+        {
+            if (responseMessage.Error != null)
+            {
+                var contractId =responseMessage.EchoReq.contract_id;
+                var command = CommandsService.GetCommands(CommandsApi.OpenContract, contractId);
+                _ws.Send(command);
+            }
+            else
+            {
+                var command = CommandsService.GetCommands(CommandsApi.OpenContract, responseMessage.Buy.contract_id);
+                _ws.Send(command);
+            }
+            
+
+        }
+
+        public void Sell(long openContractContractId, double openContractBuyPrice)
+        {
+            var command = CommandsService.GetCommands(CommandsApi.Sell, new {sell = openContractContractId, price = openContractBuyPrice});
+            _ws.Send(command);
+        }
+
         public void Authorize()
         {
             var command = CommandsService.GetCommands(CommandsApi.Authorize, _token);
@@ -110,10 +138,10 @@ namespace DerivSmartRobot.Services
             _ws.Send(command);
         }
 
-        public void GetCandlesStream(string market, int granularity)
+        public void GetCandlesStream(string market, int granularity, bool subscribe = false)
         {
             var command =
-                CommandsService.GetCommands(CommandsApi.OlhcStream, new {Market = market, Granularity = granularity});
+                CommandsService.GetCommands(CommandsApi.OlhcStream, new {Market = market, Granularity = granularity}, subscribe);
             Console.WriteLine(command);
             _ws.Send(command);
         }
@@ -124,6 +152,12 @@ namespace DerivSmartRobot.Services
                 CommandsService.GetCommands(CommandsApi.Balance, new { balance = 1, subscribe = 1 });
             Console.WriteLine(command);
             _ws.Send(command);
+        }
+
+        public void Forget(string id)
+        {
+            var command = new {forget = id};
+            _ws.Send(JsonConvert.SerializeObject(command));
         }
 
         public void SendCommand(string command)

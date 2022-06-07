@@ -19,15 +19,18 @@ namespace DerivSmartRobot.Pages
         private readonly ITradeService _tradeService;
         private readonly ReaderService _readerService;
         private System.Threading.Timer t;
+        public int LeftSeconds { get; set; } = 0;
         public Dash(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _tradeService = _serviceProvider.GetRequiredService<ITradeService>();
             _readerService = serviceProvider.GetRequiredService<ReaderService>();
             InitializeComponent();
-            t  = new System.Threading.Timer(TimerCallback, null, 0, 1000);
+            t = new System.Threading.Timer(TimerCallback, null, 0, 1000);
 
         }
+
+
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -74,97 +77,132 @@ namespace DerivSmartRobot.Pages
         //Método invocado passado para a classe Timer
         public void TimerCallback(Object o)
         {
+
             try
             {
 
-            //Verifica se é necessário invocar esse método na thread principal para interagir com os controles
-            if (InvokeRequired)
-            {
-                //Invoca este próprio método
-                Invoke((TimerCallbackDelegate)TimerCallback, o);
-                
-            }
-            else
-            {
-                //Aqui seu código estará rodando na thread principal e será possível interagir com os componentes
-                var roboOperationInfos = _tradeService.GetOperations();
-
-
-                if (roboOperationInfos.Log != null)
+                //Verifica se é necessário invocar esse método na thread principal para interagir com os controles
+                if (InvokeRequired)
                 {
-                    var logs = roboOperationInfos.Log.Log.Split(';');
-                    string analise = $"Data: {DateTime.Now}\n";
-                    foreach (var log in logs)
+                    //Invoca este próprio método
+                    Invoke((TimerCallbackDelegate)TimerCallback, o);
+
+                }
+                else
+                {
+
+                    //Aqui seu código estará rodando na thread principal e será possível interagir com os componentes
+                    var roboOperationInfos = _tradeService.GetOperations();
+
+
+                    if (roboOperationInfos.Log != null)
                     {
-                        var it = new ListViewItem(new[] { roboOperationInfos.Log.Date.ToString("g"), log });
-                        analise += $"\n {log}";
+                        if (LeftSeconds > 0)
+                        {
+                           LeftSeconds -= 1;
+                        }
+                        var logs = roboOperationInfos.Log.Log.Split(';');
+                        string analise = $"Data: {DateTime.Now}\n";
+                        foreach (var log in logs)
+                        {
+                            var it = new ListViewItem(new[] { roboOperationInfos.Log.Date.ToString("g"), log });
+                            analise += $"\n {log}";
+                        }
+
+                        analiseLabel.Text = analise;
                     }
 
-                    analiseLabel.Text = analise;
-                }
-
-                if (roboOperationInfos != null)
-                {
+                    if (roboOperationInfos != null)
+                    {
 
 
                         balanceLabel.Text = roboOperationInfos.OperationInfo.CurrentOperationBalance.ToString("F2");
                         saldoGeralLabel.Text = roboOperationInfos.OperationInfo.Balance.ToString("F2");
 
 
-                    if (roboOperationInfos.RobotConfigutarion != null)
-                    {
-                        mercadoLabel.Text = roboOperationInfos.RobotConfigutarion.Market;
-                        stakeLabel.Text = roboOperationInfos.RobotConfigutarion.Stake.ToString("F2");
-                        roboTipoLabel.Text = roboOperationInfos.RobotConfigutarion.RobotType.ToString();
-                        stopWinLabel.Text = roboOperationInfos.RobotConfigutarion.StopWin.ToString("F2");
-                        StopLossLabel.Text = roboOperationInfos.RobotConfigutarion.StopLoss.ToString("F2");
-                        martingaleLabel.Text = roboOperationInfos.RobotConfigutarion.MartingaleValue.ToString("F2");
-                    }
-
-                    if (roboOperationInfos.OperationInfo != null)
-                    {
-                        vitoriasLabel.Text = roboOperationInfos.OperationInfo.QuantWin.ToString();
-                        derrotasLabel.Text = roboOperationInfos.OperationInfo.QuantLoss.ToString();
-                        porcentagemVitoriaLabel.Text = roboOperationInfos.OperationInfo.RobotAccuracy.ToString("F2");
-                    }
-
-                    if (roboOperationInfos.Operation != null)
-                    {
-                        var op = roboOperationInfos.Operation;
-                        if (op.Action == ContractAction.Buy)
+                        if (roboOperationInfos.RobotConfigutarion != null)
                         {
-                            var item = new ListViewItem(new[] { op.ContractId, op.Contract.ToString(), op.Market.ToString(), (op.Amount * -1).ToString("F2"), op.Duration.ToString(), op.DurationType, op.Profit.ToString("F2") });
-
-                            
-                            listViewOperacoes.Items.Add(item);
+                            mercadoLabel.Text = roboOperationInfos.RobotConfigutarion.Market;
+                            stakeLabel.Text = roboOperationInfos.RobotConfigutarion.Stake.ToString("F2");
+                            roboTipoLabel.Text = roboOperationInfos.RobotConfigutarion.RobotType.ToString();
+                            stopWinLabel.Text = roboOperationInfos.RobotConfigutarion.StopWin.ToString("F2");
+                            StopLossLabel.Text = roboOperationInfos.RobotConfigutarion.StopLoss.ToString("F2");
+                            martingaleLabel.Text = roboOperationInfos.RobotConfigutarion.MartingaleValue.ToString("F2");
                         }
-                        else
+
+                        if (roboOperationInfos.OperationInfo != null)
                         {
+                            vitoriasLabel.Text = roboOperationInfos.OperationInfo.QuantWin.ToString();
+                            derrotasLabel.Text = roboOperationInfos.OperationInfo.QuantLoss.ToString();
+                            porcentagemVitoriaLabel.Text = roboOperationInfos.OperationInfo.RobotAccuracy.ToString("F2");
+                        }
+
+                       
+                            var op = roboOperationInfos.Operation;
+
+
+                            if (LeftSeconds <= 0 && op != null)
+                            {
+                                LeftSeconds = (int)(op.Expiration -DateTime.Now).TotalSeconds;
+
+                            }
+
                             var item = listViewOperacoes.FindItemWithText(op.ContractId);
-                            listViewOperacoes.Items.Remove(item);
+
+                                if (item != null)
+                                {
+                                    listViewOperacoes.Items.Remove(item);
 
 
-                            item = new ListViewItem(new[] { op.ContractId, op.Contract.ToString(), op.Market.ToString(), op.Amount.ToString("F2"), op.Duration.ToString(), op.DurationType, op.Profit.ToString("F2") });
+                                    item = new ListViewItem(new[]
+                                    {
+                                    
+                                    op.ContractId,  LeftSeconds <= 0 || (op.Status == "won" || op.Status=="lost") ? "vendido"  : LeftSeconds.ToString(), op.Contract.ToString(), op.Market.ToString(),
+                                   
+                                    op.Amount.ToString("F2"), op.Duration.ToString(), op.DurationType,
+                                    op.Profit.ToString("F2")
+                                });
 
-                            if (op.Profit > 0)
-                            {
-                                item.BackColor = Color.MediumSeaGreen;
-                                item.ForeColor = Color.White;
-                            }
-                            else
-                            {
-                                item.BackColor = Color.DarkRed;
-                                item.ForeColor = Color.White;
-                            }
-                            listViewOperacoes.Items.Add(item);
+                                    if (op.Status == "won")
+                                    {
+                                        item.BackColor = Color.MediumSeaGreen;
+                                        item.ForeColor = Color.White;
+                                        _tradeService.Operation = null;
+                                        _tradeService.HasOpenContract = false;
+
+                                        LeftSeconds = 0;
+                                    }
+                                    else if(op.Status =="lost")
+                                    {
+                                        item.BackColor = Color.DarkRed;
+                                        item.ForeColor = Color.White;
+                                        _tradeService.HasOpenContract = false;
+                                        LeftSeconds = 0;
+
+
+                                    }
+                                    else
+                                    {
+                                        item.BackColor = Color.Goldenrod ;
+                                        item.ForeColor = Color.White;
+                                        
+                                }
+
+                                    listViewOperacoes.Items.Add(item);
+
+
+                                }
+                                else
+                                {
+                                    item = new ListViewItem(new[] { op.ContractId, LeftSeconds <= 0 ? "vendido" : LeftSeconds.ToString(), op.Contract.ToString(), op.Market.ToString(), (op.Amount * -1).ToString("F2"), op.Duration.ToString(), op.DurationType, op.Profit.ToString("F2") });
+                                    listViewOperacoes.Items.Add(item);
+                                }
+                            
 
                         }
-                        _tradeService.Operation = null;
 
                     }
-
-                }
-            }
+                
             }
             catch (Exception e)
             {

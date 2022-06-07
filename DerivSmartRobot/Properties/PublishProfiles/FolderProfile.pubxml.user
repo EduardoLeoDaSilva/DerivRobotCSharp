@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Eduardo\RiderProjects\DerivSmartRobot\DerivSmartRobot\bin\Release\net6.0-windows\publish\</_PublishTargetUrl>
+    <History>True|2022-03-29T22:24:20.2906139Z;True|2022-03-27T21:18:04.9542745-03:00;True|2022-03-27T00:15:01.7403061-03:00;True|2022-03-26T21:56:54.9231688-03:00;False|2022-03-26T21:30:49.0180312-03:00;True|2022-03-26T18:42:03.0287245-03:00;</History>
+  </PropertyGroup>
+</Project>

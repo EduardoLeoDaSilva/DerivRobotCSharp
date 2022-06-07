@@ -21,5 +21,12 @@ namespace DerivSmartRobot.Models.View
         public decimal Duration { get; set; }
 
         public string DurationType { get; set; }
+
+        public string Status { get; set; }
+
+
+        public DateTime Expiration { get; set; }
+
+
     }
 }

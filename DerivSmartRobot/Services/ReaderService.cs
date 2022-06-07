@@ -4,6 +4,7 @@ using DerivSmartRobot.Models.Classes;
 using DerivSmartRobot.Models.DerivClasses;
 using DerivSmartRobot.Redis;
 using DerivSmartRobot.Robots;
+using Microsoft.VisualBasic.Logging;
 using Newtonsoft.Json;
 using NuGet.Protocol.Plugins;
 using ErrorEventArgs = WebSocketSharp.ErrorEventArgs;
@@ -14,35 +15,31 @@ namespace DerivSmartRobot.Services
     public class ReaderService
     {
         private static ITradeService _tradeService;
-        private static IRsiRobot _rsiRobot;
-        private readonly IRsiFractalRobot _rsiFractalRobotRobot;
-        private readonly ISmaAndWmaGoRobot _smaAndWmaGoRobot;
-        private readonly IRsiMacdRobot _rsiMacdRobot;
-        private readonly IMacdRobot _macdRobot;
-        private readonly IMarubuzuRobot _marubuzuRobot;
-        private readonly IDigitRobotRobot _digitRobot;
-        private readonly IRsiStockHigherAndLowerRobot _rsiStockHigherAndLowerRobotRoboto;
-        private readonly ICandleMiniReversalStrategyRobot _candleMiniReversalStrategyRobot;
-        private readonly IZigZagWithSarRobot _zigZagWithSarRobot;
+
+        private readonly IClientDeriv _client;
+
+        private readonly ITendencyWithAiRobot _tendencyWithAiRobot;
+        private readonly IDigitAiPrediction _digitAiPrediction;
+        private readonly IFractalRobot _fractalRobot;
+        private readonly ILogger<ReaderService> _logger;
+        private bool _alreadySubscribedCandleStream = false;
 
 
 
 
 
-        public ReaderService(ITradeService tradeService, IRsiRobot rsiRobot,
-            IRsiFractalRobot rsiFractalRobotRobot, ISmaAndWmaGoRobot smaAndWmaGoRobot, IRsiMacdRobot rsiMacdRobot, IMacdRobot macdRobot, IMarubuzuRobot marubuzuRobot, IDigitRobotRobot digitRobot, IRsiStockHigherAndLowerRobot rsiStockHigherAndLowerRobotRoboto, ICandleMiniReversalStrategyRobot candleMiniReversalStrategyRobot, IZigZagWithSarRobot zigZagWithSarRobot)
+
+        public ReaderService(
+            ITradeService tradeService,
+            ITendencyWithAiRobot tendencyWithAiRobot, IDigitAiPrediction digitAiPrediction, IFractalRobot fractalRobot, ILogger<ReaderService> logger, IClientDeriv client)
         {
             _tradeService = tradeService;
-            _rsiRobot = rsiRobot;
-            _rsiFractalRobotRobot = rsiFractalRobotRobot;
-            _smaAndWmaGoRobot = smaAndWmaGoRobot;
-            _rsiMacdRobot = rsiMacdRobot;
-            _macdRobot = macdRobot;
-            _marubuzuRobot = marubuzuRobot;
-            _digitRobot = digitRobot;
-            _rsiStockHigherAndLowerRobotRoboto = rsiStockHigherAndLowerRobotRoboto;
-            _candleMiniReversalStrategyRobot = candleMiniReversalStrategyRobot;
-            _zigZagWithSarRobot = zigZagWithSarRobot;
+
+            _tendencyWithAiRobot = tendencyWithAiRobot;
+            _digitAiPrediction = digitAiPrediction;
+            _fractalRobot = fractalRobot;
+            _logger = logger;
+            _client = client;
         }
 
 
@@ -51,10 +48,20 @@ namespace DerivSmartRobot.Services
         {
 
             var webSocketReturn = JsonConvert.DeserializeObject<ResponseMessage>(e.Data);
-            Console.WriteLine(e.Data);
+            _logger.LogInformation("124124");
+
+
+            _logger.LogInformation(e.Data);
             if (webSocketReturn.Error != null)
             {
+                _tradeService.HasOpenContract = false;
                 Console.WriteLine($"{webSocketReturn.Error.Message}");
+
+                if (webSocketReturn?.MsgType == MsgType.Proposal_open_contract)
+                {
+                    _tradeService.SubscribeOpenContract(webSocketReturn);
+
+                }
                 return;
             }
 
@@ -72,6 +79,9 @@ namespace DerivSmartRobot.Services
                 case MsgType.Proposal:
                     SendToRobot(webSocketReturn, CommandsApi.Proposal);
                     break;
+                case MsgType.Proposal_open_contract:
+                    SendToRobot(webSocketReturn, CommandsApi.OpenContract);
+                    break;
                 case MsgType.Ohlc:
                     SendToRobot(webSocketReturn, CommandsApi.OlhcStream);
                     break;
@@ -79,7 +89,18 @@ namespace DerivSmartRobot.Services
                     SendToRobot(webSocketReturn, CommandsApi.Candles);
                     break;
                 case MsgType.Balance:
+                    if (!_alreadySubscribedCandleStream)
+                    {
+                        _client.GetCandlesStream(_tradeService.RobotConfigutarion.Market, 60, true); //todo mudar dpois
+                        _alreadySubscribedCandleStream = true;
+                    }
                     SendToRobot(webSocketReturn, CommandsApi.Balance);
+                    break;
+                case MsgType.Forget:
+                    _tradeService.Log.Log += $";{webSocketReturn.Forget}";
+                    break;
+                case MsgType.Authorize:
+                    _client.GetBalanceStream();
                     break;
             }
         }
@@ -95,323 +116,120 @@ namespace DerivSmartRobot.Services
 
             switch (_tradeService.RobotConfigutarion.RobotType)
             {
-                case RobotType.RSI:
+                //case RobotType.TendencyWithAiRobot:
+                //    switch (commandsApi)
+                //    {
+                //        case CommandsApi.OlhcStream:
+                //            _tradeService.CandleSubscriptionId = responseMessage.Subscription.Id;
+                //            _tendencyWithAiRobot.VerifyAndBuy(responseMessage);
+                //            break;
+                //        case CommandsApi.TransactionStream:
+                //            var transaction = _tendencyWithAiRobot.GetTransactionFromCurrentOperationMarket(
+                //                _tradeService.RobotConfigutarion.Market,
+                //                responseMessage);
+                //            if (transaction != null)
+                //            {
+                //                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
+                //                _tendencyWithAiRobot.UpdateOperationInfo(responseMessage, _tradeService);
+                //            }
+                //            _tendencyWithAiRobot.GetAmountWithMartingale(_tradeService.currentOperation,
+                //                _tradeService.RobotConfigutarion.MartingaleValue,
+                //                _tradeService.RobotConfigutarion.MartigaleType);
+
+                //            break;
+                //        case CommandsApi.Buy:
+                //            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
+                //            break;
+                //        case CommandsApi.Proposal:
+                //            _tradeService.BuyAContract(responseMessage.Proposal);
+                //            break;
+                //        case CommandsApi.Candles:
+                //            _tendencyWithAiRobot.FillQuotesWithHistoricalData(responseMessage);
+                //            break;
+                //    }
+                //    break;
+                case RobotType.OverOrUnderProbability:
                     switch (commandsApi)
                     {
                         case CommandsApi.OlhcStream:
-                            _rsiRobot.VerifyAndBuy(responseMessage);
+                            _tradeService.CandleSubscriptionId = responseMessage.Subscription.Id;
+                            _digitAiPrediction.VerifyAndBuy(responseMessage);
                             break;
                         case CommandsApi.TransactionStream:
-                            var transaction = _rsiRobot.GetTransactionFromCurrentOperationMarket(
+                            var transaction = _digitAiPrediction.GetTransactionFromCurrentOperationMarket(
                                 _tradeService.RobotConfigutarion.Market,
                                 responseMessage);
                             if (transaction != null)
                             {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                    Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                }
-                                _rsiRobot.UpdateOperationInfo(responseMessage, _tradeService);
-
-                            }
-                            _rsiRobot.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _rsiRobot.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-
-                    }
-
-                    break;
-                case RobotType.Digit:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _digitRobot.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _digitRobot.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                    Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                }
-                                _digitRobot.UpdateOperationInfo(responseMessage, _tradeService);
-
-                            }
-                            _digitRobot.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _digitRobot.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-                    }
-
-                    break;
-                case RobotType.MACD:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _macdRobot.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _macdRobot.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
                                 Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _macdRobot.UpdateOperationInfo(responseMessage, _tradeService);
+                                _digitAiPrediction.UpdateOperationInfo(responseMessage, _tradeService);
                             }
-                            _macdRobot.GetAmountWithMartingale(_tradeService.currentOperation,
+                            _digitAiPrediction.GetAmountWithMartingale(_tradeService.currentOperation,
                                 _tradeService.RobotConfigutarion.MartingaleValue,
                                 _tradeService.RobotConfigutarion.MartigaleType);
 
                             break;
+                        case CommandsApi.OpenContract:
+
+                            _digitAiPrediction.UpdateOperationInfo(responseMessage, _tradeService);
+
+                            _digitAiPrediction.GetAmountWithMartingale(_tradeService.currentOperation,
+                                _tradeService.RobotConfigutarion.MartingaleValue,
+                                _tradeService.RobotConfigutarion.MartigaleType);
+
+                            break;
+
                         case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
+                            _tradeService.SubscribeOpenContract(responseMessage);
                             break;
                         case CommandsApi.Proposal:
                             _tradeService.BuyAContract(responseMessage.Proposal);
                             break;
                         case CommandsApi.Candles:
-                            _macdRobot.FillQuotesWithHistoricalData(responseMessage);
+                            _digitAiPrediction.FillQuotesWithHistoricalData(responseMessage);
                             break;
                     }
                     break;
-                case RobotType.RSIMACD:
+                case RobotType.FractalWithTendency:
                     switch (commandsApi)
                     {
                         case CommandsApi.OlhcStream:
-                            _rsiMacdRobot.VerifyAndBuy(responseMessage);
+                            _tradeService.CandleSubscriptionId = responseMessage.Subscription.Id;
+                            _fractalRobot.VerifyAndBuy(responseMessage);
                             break;
                         case CommandsApi.TransactionStream:
-                            var transaction = _rsiMacdRobot.GetTransactionFromCurrentOperationMarket(
+                            var transaction = _fractalRobot.GetTransactionFromCurrentOperationMarket(
                                 _tradeService.RobotConfigutarion.Market,
                                 responseMessage);
                             if (transaction != null)
                             {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
                                 Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _rsiMacdRobot.UpdateOperationInfo(responseMessage, _tradeService);
+                                _fractalRobot.UpdateOperationInfo(responseMessage, _tradeService);
                             }
-                            _rsiMacdRobot.GetAmountWithMartingale(_tradeService.currentOperation,
+                            _fractalRobot.GetAmountWithMartingale(_tradeService.currentOperation,
                                 _tradeService.RobotConfigutarion.MartingaleValue,
                                 _tradeService.RobotConfigutarion.MartigaleType);
 
                             break;
+
+                        case CommandsApi.OpenContract:
+
+                                _fractalRobot.UpdateOperationInfo(responseMessage, _tradeService);
+                            
+                            _fractalRobot.GetAmountWithMartingale(_tradeService.currentOperation,
+                                _tradeService.RobotConfigutarion.MartingaleValue,
+                                _tradeService.RobotConfigutarion.MartigaleType);
+
+                            break;
+
                         case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
+                            _tradeService.SubscribeOpenContract(responseMessage);
                             break;
                         case CommandsApi.Proposal:
                             _tradeService.BuyAContract(responseMessage.Proposal);
                             break;
                         case CommandsApi.Candles:
-                            _rsiMacdRobot.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-                    }
-                    break;
-                case RobotType.RsiFractal:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _rsiFractalRobotRobot.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _rsiFractalRobotRobot.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
-                                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _rsiFractalRobotRobot.UpdateOperationInfo(responseMessage, _tradeService);
-                            }
-                            _rsiFractalRobotRobot.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _rsiFractalRobotRobot.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-                    }
-                    break;
-                case RobotType.Marubuzu:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _marubuzuRobot.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _marubuzuRobot.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
-                                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _marubuzuRobot.UpdateOperationInfo(responseMessage, _tradeService);
-                            }
-                            _marubuzuRobot.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _marubuzuRobot.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-                    }
-                    break;
-                case RobotType.RsiStockHigherAndLower:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _rsiStockHigherAndLowerRobotRoboto.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _rsiStockHigherAndLowerRobotRoboto.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
-                                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _rsiStockHigherAndLowerRobotRoboto.UpdateOperationInfo(responseMessage, _tradeService);
-                            }
-                            _rsiStockHigherAndLowerRobotRoboto.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _rsiStockHigherAndLowerRobotRoboto.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-                    }
-                    break;
-                case RobotType.MiniReversalStrategy:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _candleMiniReversalStrategyRobot.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _candleMiniReversalStrategyRobot.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
-                                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _candleMiniReversalStrategyRobot.UpdateOperationInfo(responseMessage, _tradeService);
-                            }
-                            _candleMiniReversalStrategyRobot.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _candleMiniReversalStrategyRobot.FillQuotesWithHistoricalData(responseMessage);
-                            break;
-                    }
-                    break;
-                case RobotType.ZigZagWithSarRobot:
-                    switch (commandsApi)
-                    {
-                        case CommandsApi.OlhcStream:
-                            _zigZagWithSarRobot.VerifyAndBuy(responseMessage);
-                            break;
-                        case CommandsApi.TransactionStream:
-                            var transaction = _zigZagWithSarRobot.GetTransactionFromCurrentOperationMarket(
-                                _tradeService.RobotConfigutarion.Market,
-                                responseMessage);
-                            if (transaction != null)
-                            {
-                                if (transaction.Action == ContractAction.Sell)
-                                {
-                                    _tradeService.IsOperating = false;
-                                }
-                                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
-                                _zigZagWithSarRobot.UpdateOperationInfo(responseMessage, _tradeService);
-                            }
-                            _zigZagWithSarRobot.GetAmountWithMartingale(_tradeService.currentOperation,
-                                _tradeService.RobotConfigutarion.MartingaleValue,
-                                _tradeService.RobotConfigutarion.MartigaleType);
-
-                            break;
-                        case CommandsApi.Buy:
-                            Console.WriteLine($"Realizando aporte de {responseMessage.Buy.buy_price}");
-                            break;
-                        case CommandsApi.Proposal:
-                            _tradeService.BuyAContract(responseMessage.Proposal);
-                            break;
-                        case CommandsApi.Candles:
-                            _zigZagWithSarRobot.FillQuotesWithHistoricalData(responseMessage);
+                            _fractalRobot.FillQuotesWithHistoricalData(responseMessage);
                             break;
                     }
                     break;

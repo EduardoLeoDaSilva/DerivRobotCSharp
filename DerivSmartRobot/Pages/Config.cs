@@ -111,7 +111,7 @@ namespace DerivSmartRobot.Pages
                 MartigaleType = MartingaleType.Normal,
                 Stake = 0,
                 MartingaleValue = 0,
-                RobotType = RobotType.Digit,
+                RobotType = RobotType.OverOrUnderProbability,
                 StopLoss = 0,
                 StopWin = 0,
                 MaxLossSequence = 0,

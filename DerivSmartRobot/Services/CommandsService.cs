@@ -6,7 +6,7 @@ namespace DerivSmartRobot.Services
 {
     public class CommandsService
     {
-        public static string GetCommands(CommandsApi command, dynamic data)
+        public static string GetCommands(CommandsApi command, dynamic data, bool subscribe = false)
         {
             switch (command)
             {
@@ -78,6 +78,40 @@ namespace DerivSmartRobot.Services
                     });
                     return tt;
                 }
+                    
+                case CommandsApi.Sell:
+                {
+                    var obj = new
+                    {
+                        sell = data.sell,
+                        price = data.price
+                    };
+                    var tt = JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+                    {
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+                    return tt;
+                }
+
+                
+
+                case CommandsApi.OpenContract:
+                {
+                        var obj = new
+                        {
+                            proposal_open_contract = 1,
+                            contract_id = data,
+                            subscribe = 1
+                        };
+
+                        var tt = JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+                    {
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+                    return tt;
+                }
 
 
                 case CommandsApi.OlhcStream:
@@ -92,7 +126,7 @@ namespace DerivSmartRobot.Services
                         start = 1,
                         style = "candles",
                         granularity = data.Granularity,
-                        subscribe = 1
+                        subscribe = subscribe ? 1 : 0
                     };
                     var tt = JsonConvert.SerializeObject(request, new JsonSerializerSettings
                     {

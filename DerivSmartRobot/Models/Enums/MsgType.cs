@@ -23,6 +23,12 @@ namespace DerivSmartRobot.Domain.Enums
         [JsonProperty("ohlc")]
         Ohlc,
         [JsonProperty("candles")]
-        Candles
+        Candles,
+        [JsonProperty("forget")]
+        Forget,
+        [JsonProperty("proposal_open_contract")]
+        Proposal_open_contract,
+        [JsonProperty("sell")]
+        Sell
     }
 }

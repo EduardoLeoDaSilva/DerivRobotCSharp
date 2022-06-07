@@ -70,6 +70,7 @@ namespace DerivSmartRobot.Pages
             this.panel9 = new System.Windows.Forms.Panel();
             this.listViewOperacoes = new System.Windows.Forms.ListView();
             this.ContratoId = new System.Windows.Forms.ColumnHeader();
+            this.Tempo = new System.Windows.Forms.ColumnHeader();
             this.Contrato = new System.Windows.Forms.ColumnHeader();
             this.Mercado = new System.Windows.Forms.ColumnHeader();
             this.Stake = new System.Windows.Forms.ColumnHeader();
@@ -306,9 +307,9 @@ namespace DerivSmartRobot.Pages
             this.label3.ForeColor = System.Drawing.Color.White;
             this.label3.Location = new System.Drawing.Point(74, 51);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(32, 23);
+            this.label3.Size = new System.Drawing.Size(46, 23);
             this.label3.TabIndex = 1;
-            this.label3.Text = "R$";
+            this.label3.Text = "USD";
             this.label3.Click += new System.EventHandler(this.label2_Click);
             // 
             // balanceLabel
@@ -456,7 +457,7 @@ namespace DerivSmartRobot.Pages
             this.panel5.Controls.Add(this.label17);
             this.panel5.Location = new System.Drawing.Point(3, 193);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(500, 407);
+            this.panel5.Size = new System.Drawing.Size(407, 407);
             this.panel5.TabIndex = 4;
             // 
             // analiseLabel
@@ -474,7 +475,7 @@ namespace DerivSmartRobot.Pages
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label17.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(214)))), ((int)(((byte)(223)))));
-            this.label17.Location = new System.Drawing.Point(206, 15);
+            this.label17.Location = new System.Drawing.Point(160, 15);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(87, 25);
             this.label17.TabIndex = 0;
@@ -497,7 +498,7 @@ namespace DerivSmartRobot.Pages
             this.panel7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(214)))), ((int)(((byte)(223)))));
             this.panel7.Location = new System.Drawing.Point(0, 1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(503, 156);
+            this.panel7.Size = new System.Drawing.Size(559, 156);
             this.panel7.TabIndex = 1;
             // 
             // minimizeBtn
@@ -538,9 +539,9 @@ namespace DerivSmartRobot.Pages
             this.panel9.BackColor = System.Drawing.Color.White;
             this.panel9.Controls.Add(this.listViewOperacoes);
             this.panel9.Controls.Add(this.label18);
-            this.panel9.Location = new System.Drawing.Point(503, 193);
+            this.panel9.Location = new System.Drawing.Point(416, 193);
             this.panel9.Name = "panel9";
-            this.panel9.Size = new System.Drawing.Size(623, 407);
+            this.panel9.Size = new System.Drawing.Size(710, 407);
             this.panel9.TabIndex = 6;
             // 
             // listViewOperacoes
@@ -550,6 +551,7 @@ namespace DerivSmartRobot.Pages
             this.listViewOperacoes.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listViewOperacoes.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ContratoId,
+            this.Tempo,
             this.Contrato,
             this.Mercado,
             this.Stake,
@@ -561,7 +563,7 @@ namespace DerivSmartRobot.Pages
             this.listViewOperacoes.Location = new System.Drawing.Point(3, 55);
             this.listViewOperacoes.MultiSelect = false;
             this.listViewOperacoes.Name = "listViewOperacoes";
-            this.listViewOperacoes.Size = new System.Drawing.Size(617, 352);
+            this.listViewOperacoes.Size = new System.Drawing.Size(704, 352);
             this.listViewOperacoes.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.listViewOperacoes.TabIndex = 1;
             this.listViewOperacoes.UseCompatibleStateImageBehavior = false;
@@ -573,6 +575,11 @@ namespace DerivSmartRobot.Pages
             this.ContratoId.Tag = "ContratoId";
             this.ContratoId.Text = "ContratoId";
             this.ContratoId.Width = 120;
+            // 
+            // Tempo
+            // 
+            this.Tempo.Text = "Tempo";
+            this.Tempo.Width = 100;
             // 
             // Contrato
             // 
@@ -707,5 +714,6 @@ namespace DerivSmartRobot.Pages
         private Button minimizeBtn;
         private Label analiseLabel;
         private Panel panel8;
+        private ColumnHeader Tempo;
     }
 }

@@ -27,7 +27,18 @@ namespace DerivSmartRobot.Models.DerivClasses
         [JsonProperty("candles")]
         public List<CandleResponse> Candles { get; set; }
 
+        [JsonProperty("proposal_open_contract")]
+        public ProposalOpenContract OpenContract { get; set; }
+
         [JsonProperty("ohlc")]
         public Ohlc Ohlc { get; set; }
+
+        [JsonProperty("forget")]
+        public string Forget { get; set; }
+        
+
+        [JsonProperty("echo_req")]
+        public dynamic EchoReq { get; set; }
+
     }
 }

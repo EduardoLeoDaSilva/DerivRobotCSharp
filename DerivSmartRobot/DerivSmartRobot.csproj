@@ -7,14 +7,25 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>preview</LangVersion>
+		<ApplicationIcon>My-project-_7_.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="My-project-_7_.ico" />
+	</ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="EPPlus" Version="5.8.5" />
+        <PackageReference Include="LG.Microsoft.ML.FastTree" Version="1.6.0.4" />
         <PackageReference Include="MediatR" Version="10.0.1" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.ML" Version="1.7.1" />
+        <PackageReference Include="Microsoft.ML.FastTree" Version="1.7.1" />
+        <PackageReference Include="Microsoft.ML.TensorFlow" Version="1.7.1" />
+        <PackageReference Include="Microsoft.ML.TensorFlow.Redist" Version="0.14.0" />
+        <PackageReference Include="Microsoft.ML.TimeSeries" Version="1.7.1" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.1" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="0.9.579-prerelease" />
         <PackageReference Include="Skender.Stock.Indicators" Version="1.22.0" />

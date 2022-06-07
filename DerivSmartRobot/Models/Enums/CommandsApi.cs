@@ -10,6 +10,8 @@
         Proposal,
         OlhcStream,
         Candles,
-        Balance
+        Balance,
+        OpenContract,
+        Sell
     }
 }

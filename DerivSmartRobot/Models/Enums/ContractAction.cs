@@ -3,6 +3,7 @@
     public enum ContractAction
     {
         Sell,
-        Buy
+        Buy,
+        Open
     }
 }

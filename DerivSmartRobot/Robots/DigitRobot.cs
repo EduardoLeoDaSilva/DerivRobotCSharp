@@ -34,13 +34,13 @@ namespace DerivSmartRobot.Robots
             this._tradeService.Log = this._tradeService.Log = new LogView { Date = DateTime.Now, Log = "Verificando dígitos" };
 
 
-            if (_tradeService.currentOperation.LossToRecover > 0)
-            {
-                _tradeService.RobotConfigutarion.RobotType = RobotType.RSI;
-                _tradeService.RobotConfigutarion.CalledFrom = RobotType.Digit;
-                _tradeService.QuotesCached = Quotes;
-                return;
-            }
+            //if (_tradeService.currentOperation.LossToRecover > 0)
+            //{
+            //    _tradeService.RobotConfigutarion.RobotType = RobotType.RSI;
+            //    _tradeService.RobotConfigutarion.CalledFrom = RobotType.Digit;
+            //    _tradeService.QuotesCached = Quotes;
+            //    return;
+            //}
 
             var quoteString = quote.Close.ToString("F"+ message.Ohlc.Pip_size);
             var currentLastDigit = quoteString.Substring(quoteString.Length - 1, 1);
