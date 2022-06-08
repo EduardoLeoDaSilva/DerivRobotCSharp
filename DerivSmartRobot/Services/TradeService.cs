@@ -3,6 +3,7 @@ using DerivSmartRobot.Models.Classes;
 using DerivSmartRobot.Models.DerivClasses;
 using DerivSmartRobot.Models.View;
 using DerivSmartRobot.Redis;
+using Newtonsoft.Json;
 using Skender.Stock.Indicators;
 
 namespace DerivSmartRobot.Services
@@ -29,6 +30,8 @@ namespace DerivSmartRobot.Services
 
         public LogView Log { get; set; }
         public Guid CandleSubscriptionId { get; set; }
+
+        public List<ResponseMessage> LogsResponse { get; set; }
 
         public TradeService(IClientDeriv client)
         {
@@ -128,7 +131,9 @@ namespace DerivSmartRobot.Services
                 currentOperation.QuantLoss += 1;
                 currentOperation.LossToRecover += currentOperation.LastValueLost;
                 currentOperation.CurrentOperationBalance += currentOperation.LastValueLost *-1;
-                _client.Forget(responseMessage.Subscription.Id.ToString());
+                if(responseMessage != null)
+                   _client.Forget(responseMessage.Subscription.Id.ToString());
+                
                 HasOpenContract = false;
                 return;
             }
@@ -149,6 +154,13 @@ namespace DerivSmartRobot.Services
                 HasOpenContract = false;
                 return;
             }
+            else
+            {
+                if (LogsResponse == null)
+                    LogsResponse = new List<ResponseMessage>();
+
+                LogsResponse.Add(responseMessage);
+            }
 
             try
             {
@@ -163,11 +175,11 @@ namespace DerivSmartRobot.Services
             }
 
             
-            if ((responseMessage.OpenContract.ProfitPercentage > 80 || responseMessage.OpenContract.ProfitPercentage < -20) && responseMessage.OpenContract.IsValidToSell)
-            {
-                _client.Sell(responseMessage.OpenContract.ContractId, responseMessage.OpenContract.Profit + responseMessage.OpenContract.BuyPrice);
-                return;
-            }
+            //if ((responseMessage.OpenContract.ProfitPercentage > 80 || responseMessage.OpenContract.ProfitPercentage < -20) && responseMessage.OpenContract.IsValidToSell)
+            //{
+            //    _client.Sell(responseMessage.OpenContract.ContractId, responseMessage.OpenContract.Profit + responseMessage.OpenContract.BuyPrice);
+            //    return;
+            //}
         }
 
 

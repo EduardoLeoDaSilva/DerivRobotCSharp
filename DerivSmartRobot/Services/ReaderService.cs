@@ -21,6 +21,8 @@ namespace DerivSmartRobot.Services
         private readonly ITendencyWithAiRobot _tendencyWithAiRobot;
         private readonly IDigitAiPrediction _digitAiPrediction;
         private readonly IFractalRobot _fractalRobot;
+        private readonly IRsiMacdRobot _rsiMacdRobot;
+
         private readonly ILogger<ReaderService> _logger;
         private bool _alreadySubscribedCandleStream = false;
 
@@ -31,7 +33,7 @@ namespace DerivSmartRobot.Services
 
         public ReaderService(
             ITradeService tradeService,
-            ITendencyWithAiRobot tendencyWithAiRobot, IDigitAiPrediction digitAiPrediction, IFractalRobot fractalRobot, ILogger<ReaderService> logger, IClientDeriv client)
+            ITendencyWithAiRobot tendencyWithAiRobot, IDigitAiPrediction digitAiPrediction, IFractalRobot fractalRobot, ILogger<ReaderService> logger, IClientDeriv client, IRsiMacdRobot rsiMacdRobot)
         {
             _tradeService = tradeService;
 
@@ -40,6 +42,7 @@ namespace DerivSmartRobot.Services
             _fractalRobot = fractalRobot;
             _logger = logger;
             _client = client;
+            _rsiMacdRobot = rsiMacdRobot;
         }
 
 
@@ -48,7 +51,7 @@ namespace DerivSmartRobot.Services
         {
 
             var webSocketReturn = JsonConvert.DeserializeObject<ResponseMessage>(e.Data);
-            _logger.LogInformation("124124");
+            Console.WriteLine(e.Data);
 
 
             _logger.LogInformation(e.Data);
@@ -230,6 +233,49 @@ namespace DerivSmartRobot.Services
                             break;
                         case CommandsApi.Candles:
                             _fractalRobot.FillQuotesWithHistoricalData(responseMessage);
+                            break;
+                    }
+                    break;
+                case RobotType.RsiWithMacd:
+                    switch (commandsApi)
+                    {
+                        case CommandsApi.OlhcStream:
+                            _tradeService.CandleSubscriptionId = responseMessage.Subscription.Id;
+                            _rsiMacdRobot.VerifyAndBuy(responseMessage);
+                            break;
+                        case CommandsApi.TransactionStream:
+                            var transaction = _rsiMacdRobot.GetTransactionFromCurrentOperationMarket(
+                                _tradeService.RobotConfigutarion.Market,
+                                responseMessage);
+                            if (transaction != null)
+                            {
+                                Console.WriteLine($"Lucro/Perda de: {transaction.Amount}");
+                                _rsiMacdRobot.UpdateOperationInfo(responseMessage, _tradeService);
+                            }
+                            _rsiMacdRobot.GetAmountWithMartingale(_tradeService.currentOperation,
+                                _tradeService.RobotConfigutarion.MartingaleValue,
+                                _tradeService.RobotConfigutarion.MartigaleType);
+
+                            break;
+
+                        case CommandsApi.OpenContract:
+
+                            _rsiMacdRobot.UpdateOperationInfo(responseMessage, _tradeService);
+
+                            _rsiMacdRobot.GetAmountWithMartingale(_tradeService.currentOperation,
+                                _tradeService.RobotConfigutarion.MartingaleValue,
+                                _tradeService.RobotConfigutarion.MartigaleType);
+
+                            break;
+
+                        case CommandsApi.Buy:
+                            _tradeService.SubscribeOpenContract(responseMessage);
+                            break;
+                        case CommandsApi.Proposal:
+                            _tradeService.BuyAContract(responseMessage.Proposal);
+                            break;
+                        case CommandsApi.Candles:
+                            _rsiMacdRobot.FillQuotesWithHistoricalData(responseMessage);
                             break;
                     }
                     break;

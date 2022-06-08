@@ -147,6 +147,8 @@ namespace DerivSmartRobot.Pages
 
                             }
 
+                        if (op == null)
+                            return;
                             var item = listViewOperacoes.FindItemWithText(op.ContractId);
 
                                 if (item != null)

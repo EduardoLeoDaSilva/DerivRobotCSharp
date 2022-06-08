@@ -36,12 +36,8 @@ internal static class Program
 
         //Application.Run(new Login(serviceProvider));
         Application.Run(new Login(serviceProvider));
-        AllocConsole();
     }
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    static extern bool AllocConsole();
     static void ConfigureServices(ServiceCollection services)
     {
         services.AddSingleton<IClientDeriv, DerivClient>();
@@ -51,6 +47,8 @@ internal static class Program
         services.AddSingleton<ITendencyWithAiRobot, TendencyWithAi>();
         services.AddSingleton<IDigitAiPrediction, DigitAiPrediction>();
         services.AddSingleton<IFractalRobot, FractalRobot>();
+        services.AddSingleton<IRsiMacdRobot, RsiMacdRobot>();
+
 
 
         services.AddSingleton<AIService>();

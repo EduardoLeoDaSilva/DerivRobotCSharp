@@ -4,6 +4,7 @@ using DerivSmartRobot.Models.DerivClasses;
 using DerivSmartRobot.Models.NewFolder;
 using DerivSmartRobot.Models.View;
 using DerivSmartRobot.Services;
+using System.Diagnostics;
 
 namespace DerivSmartRobot.Robots
 {
@@ -22,6 +23,7 @@ namespace DerivSmartRobot.Robots
 
         public override async void VerifyAndBuy(ResponseMessage message)
         {
+            Debug.WriteLine("Teste");
             var quote = this.BuildQuoteModel(message);
             Quotes.Add(quote);
 
